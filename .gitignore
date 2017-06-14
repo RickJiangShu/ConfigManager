@@ -9,3 +9,6 @@ Bin-Android/
 #VS文件
 *.csproj
 *.sln
+*.suo
+*.user
+*.swp

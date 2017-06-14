@@ -1,0 +1,36 @@
+﻿using System;
+using System.Collections.Generic;
+
+/// <summary>
+/// 不要手动更改，由ConfigEditor自动生成的配置文件（模板为GetterTemplete）
+/// </summary>
+public class /*ClassName*/
+{
+	//属性
+	/*PropertiesDeclaration*/
+
+	#region 静态方法
+	public static Dictionary</*IdType*/, /*ClassName*/> Map;
+
+	public static /*ClassName*/ Get(/*IdType*/ /*IdField*/)
+	{
+		return Map[/*IdField*/];
+	}
+	public static void Parse(string cfgStr)
+	{
+		Map = new Dictionary</*IdType*/, /*ClassName*/>();
+		string[][] configArray = ConfigUtils.ParseConfig(cfgStr);
+		int len = configArray.Length;
+        
+		for(int i = 3;i<len;i++)
+		{
+			string[] args = configArray[i];
+			/*ClassName*/ cfg = new /*ClassName*/();
+			
+			/*PropertiesParse*/
+			
+			Map[cfg./*IdField*/] = cfg;
+		}
+	}
+	#endregion
+}

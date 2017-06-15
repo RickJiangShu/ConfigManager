@@ -15,7 +15,8 @@ public class Test : MonoBehaviour {
         print(monsterCfg.name);
         print(equipCfg.boxBonus);
         print(typesCfg.p15);
-	}
+	
+    }
 	
 	// Update is called once per frame
 	void Update () {

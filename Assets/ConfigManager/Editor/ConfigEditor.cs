@@ -64,7 +64,7 @@ public class ConfigEditor : Editor
             string outputFileName = ConfigManagerSettings.OutputURL + "/" + ClassName + ".cs";//输出文件名
             string fileString = stream.ReadToEnd();
             string config = String2Config(fileString, getterTemplete, ClassName);//C#代码
-            LoaderParse += String2Loader(ClassName, FileName) + "\n";//Loader解析代码
+            LoaderParse += String2Loader(ClassName, FileName) + "\r\n";//Loader解析代码
 
             stream.Close();//关闭txt文件流
 
@@ -105,7 +105,7 @@ public class ConfigEditor : Editor
         for (int i = 0, l = propertiesId.Length; i < l; i++)
         {
             if (i == 0) IdField = propertiesId[i];
-            PropertiesDeclaration += string.Format(declarationTemplete, propertiesType[i], propertiesId[i], propertiesComments[i]) + "\n\t";
+            PropertiesDeclaration += string.Format(declarationTemplete, propertiesType[i], propertiesId[i], propertiesComments[i]) + "\r\n\t";
         }
 
         //属性解析
@@ -117,11 +117,11 @@ public class ConfigEditor : Editor
             string baseType;
             if (IsArrayType(propertiesType[i],out baseType))
             {
-                PropertiesParse += string.Format(parseTemplete_Array, propertiesId[i], baseType, i, BaseType2ParseFunc(baseType)) + "\n\t\t\t";
+                PropertiesParse += string.Format(parseTemplete_Array, propertiesId[i], baseType, i, BaseType2ParseFunc(baseType)) + "\r\n\t\t\t";
             }
             else
             {
-                PropertiesParse += string.Format(parseTemplete, propertiesId[i], BaseType2ParseFunc(propertiesType[i]), i) + "\n\t\t\t";
+                PropertiesParse += string.Format(parseTemplete, propertiesId[i], BaseType2ParseFunc(propertiesType[i]), i) + "\r\n\t\t\t";
             }
         }
 
@@ -138,21 +138,21 @@ public class ConfigEditor : Editor
 
 
     //加载AssetBundle模板
-    private static string LoadAssetBundleTemplete = "\t\tAssetBundle bundle = AssetBundle.LoadFromFile(ConfigManagerSettings.AssetBundleURL);\n\n";
+    private static string LoadAssetBundleTemplete = "\t\tAssetBundle bundle = AssetBundle.LoadFromFile(ConfigManagerSettings.AssetBundleURL);\r\n\r\n";
 
     //解析Resources相对路径目录
     private static string RelativeURLTemplete = 
-        "\t\tint startIndex = ConfigManagerSettings.FilesURL.LastIndexOf(\"Resources/\") + 10;\n" +
-        "\t\tint length = ConfigManagerSettings.FilesURL.Length - startIndex;\n" +
-        "\t\tstring relativeURL = ConfigManagerSettings.FilesURL.Substring(startIndex, length);\n\n";
+        "\t\tint startIndex = ConfigManagerSettings.FilesURL.LastIndexOf(\"Resources/\") + 10;\r\n" +
+        "\t\tint length = ConfigManagerSettings.FilesURL.Length - startIndex;\r\n" +
+        "\t\tstring relativeURL = ConfigManagerSettings.FilesURL.Substring(startIndex, length);\r\n\r\n";
 
     //AssetBundle加载解析模板
-    private static string AssetBundleParseTemplete = "\t\tstring /*FileName*/Text = bundle.LoadAsset<TextAsset>(\"/*FileName*/\").text;\n" +
-           "\t\t/*ClassName*/.Parse(/*FileName*/Text);\n";
+    private static string AssetBundleParseTemplete = "\t\tstring /*FileName*/Text = bundle.LoadAsset<TextAsset>(\"/*FileName*/\").text;\r\n" +
+           "\t\t/*ClassName*/.Parse(/*FileName*/Text);\r\n";
 
     //Resources加载解析模板
-    private static string ResroucesParseTemplete = "\t\tstring /*FileName*/Text = Resources.Load<TextAsset>(relativeURL + \"/\" + \"/*FileName*/\").text;\n" +
-           "\t\t/*ClassName*/.Parse(/*FileName*/Text);\n";
+    private static string ResroucesParseTemplete = "\t\tstring /*FileName*/Text = Resources.Load<TextAsset>(relativeURL + \"/\" + \"/*FileName*/\").text;\r\n" +
+           "\t\t/*ClassName*/.Parse(/*FileName*/Text);\r\n";
 
     private static string String2Loader(string ClassName,string FileName)
     {
@@ -278,18 +278,31 @@ internal class FileUtils
         if (Directory.Exists(folderPath))
         {
             Directory.Delete(folderPath, true);
+            //删除.meta
+            DeleteFile(folderPath + ".meta");
+
+            
             AssetDatabase.Refresh();
         }
     }
 
-    public static void CreateFile(string fileName)
+    public static void CreateFile(string filePath)
     {
-        if (!File.Exists(fileName))
+        if (!File.Exists(filePath))
         {
-            CreateFolder(fileName.Substring(0, fileName.LastIndexOf('/')));
+            CreateFolder(filePath.Substring(0, filePath.LastIndexOf('/')));
 
-            FileStream stream = File.Create(fileName);
+            FileStream stream = File.Create(filePath);
             stream.Close();
+        }
+    }
+
+    public static void DeleteFile(string filePath)
+    {
+     //   Debug.Log("DeleteFile：" + filePath);
+        if (File.Exists(filePath))
+        {
+            File.Delete(filePath);
         }
     }
 

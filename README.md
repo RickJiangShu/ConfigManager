@@ -2,7 +2,7 @@
 
 ## 简介
 ConfigManager使开发人员一键导入并使用配置文件。<br>
-Github：https://github.com/RickJiangShu/ConfigManager/new
+Github：https://github.com/RickJiangShu/ConfigManager
 
 ## 特点
 1、将*.txt文件一键解析成*.cs文件（称之getter），方便直观；<br>

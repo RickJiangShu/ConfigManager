@@ -12,3 +12,7 @@ Bin-Android/
 *.suo
 *.user
 *.swp
+
+#项目文件
+Assets/CustomPlugins/
+Assets/CustomPlugins.meta

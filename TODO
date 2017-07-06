@@ -1,0 +1,15 @@
+2017/7/6 星期四
+Config Manager 2开发计划
+
+1、优化运行时解析速度
+	* 设计思路：在编辑器下将txt文件解析并序列化成二进制文件，运行时直接加载二进制文件即可无需解析。
+	使用UnityEditor.SerializedObject 序列化文件
+
+2、与项目加载解耦
+
+* 配置窗口
+
+3、将ConfigManager分离成Source 和 Example
+
+4、支持CVS格式 
+

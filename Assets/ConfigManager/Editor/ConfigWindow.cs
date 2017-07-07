@@ -60,6 +60,10 @@ public class ConfigWindow : EditorWindow
             PlayerPrefs.SetString(cacheKey + "OutputPath", outputPath);
         }
 
+        //Operation
+        EditorGUILayout.Space();
+        GUILayout.Label("Operation", EditorStyles.boldLabel);
+
         if (GUILayout.Button("Clear Output"))
         {
             ClearOutput();

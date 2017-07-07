@@ -1,0 +1,3 @@
+[submodule "Assets/FileTools"]
+	path = Assets/FileTools
+	url = git@github.com:RickJiangShu/FileTools.git

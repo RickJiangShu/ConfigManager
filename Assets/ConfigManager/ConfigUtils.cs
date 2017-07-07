@@ -34,7 +34,6 @@ public class ConfigUtils
     /// <returns></returns>
     public static T[] ParseArray<T>(string cfg, Func<string, T> ParseFunc)
     {
-        if (string.IsNullOrEmpty(cfg) || cfg == "0") return null;
 
         if (cfg.Contains(","))
         {

@@ -22,21 +22,28 @@ public class ConfigWindow : EditorWindow
         EditorWindow.GetWindow<ConfigWindow>("ConfigManager");
     }
 
+    //
+    private string[] configTypeOptions = new string[] { "txt(tsv)", "csv" };
+    private string[] lfOptions = new string[] { "CR LF", "LF" };
 
+    /// <summary>
+    /// 对应ConfigType的分隔符
+    /// </summary>
+    private string[] separatedValues = new string[] { "\t", "," };
+    /// <summary>
+    /// 对应lfOptions的换行符
+    /// </summary>
+    private string[] lineFeed = new string[] { "\r\n", "\n" };
+
+    //
     private string inputPath;
     private string outputPath;
+    private int configTypeIndex;
+    private int lfIndex;
 
     void Awake()
     {
-        //取缓存
-        inputPath = PlayerPrefs.GetString(cacheKey + "InputPath");
-        outputPath = PlayerPrefs.GetString(cacheKey + "OutputPath");
-
-        //设置缺省值
-        if (string.IsNullOrEmpty(inputPath))
-            inputPath = "Assets/Resources/Config";
-        if (string.IsNullOrEmpty(outputPath))
-            outputPath = "Assets/Resources/ConfigOutput";
+        LoadCacheOrInit();
     }
 
 
@@ -45,20 +52,14 @@ public class ConfigWindow : EditorWindow
         //Base Settings
         GUILayout.Label("Base Settings", EditorStyles.boldLabel);
 
-        string inputText = EditorGUILayout.TextField("Input Path", inputPath);
-        string outputText = EditorGUILayout.TextField("Output Path", outputPath);
+        inputPath = EditorGUILayout.TextField("Input Path", inputPath);
+        outputPath = EditorGUILayout.TextField("Output Path", outputPath);
 
-        //设置路径并缓存
-        if (inputText != inputPath)
-        {
-            inputPath = inputText;
-            PlayerPrefs.SetString(cacheKey + "InputPath", inputPath);
-        }
-        if (outputText != outputPath)
-        {
-            outputPath = outputText;
-            PlayerPrefs.SetString(cacheKey + "OutputPath", outputPath);
-        }
+        //Config Type
+        configTypeIndex = EditorGUILayout.Popup("Config Type", configTypeIndex, configTypeOptions);
+
+        //LF
+        lfIndex = EditorGUILayout.Popup("End of Line", lfIndex, lfOptions);
 
         //Operation
         EditorGUILayout.Space();
@@ -72,6 +73,12 @@ public class ConfigWindow : EditorWindow
         if(GUILayout.Button("Output"))
         {
             Output();
+        }
+
+        //缓存设置
+        if (GUI.changed)
+        {
+            SaveCache();
         }
     }
 
@@ -132,6 +139,34 @@ public class ConfigWindow : EditorWindow
         }
 
         AssetDatabase.Refresh();
+    }
+
+    /// <summary>
+    /// 加载缓存或初始化
+    /// </summary>
+    private void LoadCacheOrInit()
+    {
+        //取缓存
+        inputPath = PlayerPrefs.GetString(cacheKey + "InputPath");
+        outputPath = PlayerPrefs.GetString(cacheKey + "OutputPath");
+        configTypeIndex = PlayerPrefs.GetInt(cacheKey + "ConfigTypeIndex");
+        lfIndex = PlayerPrefs.GetInt(cacheKey + "LFIndex");
+
+        //设置缺省值
+        if (string.IsNullOrEmpty(inputPath))
+            inputPath = "Assets/Resources/Config";
+        if (string.IsNullOrEmpty(outputPath))
+            outputPath = "Assets/Resources/ConfigOutput";
+    }
+    /// <summary>
+    /// 保存缓存
+    /// </summary>
+    private void SaveCache()
+    {
+        PlayerPrefs.SetString(cacheKey + "InputPath", inputPath);
+        PlayerPrefs.SetString(cacheKey + "OutputPath", outputPath);
+        PlayerPrefs.SetInt(cacheKey + "ConfigTypeIndex", configTypeIndex);
+        PlayerPrefs.SetInt(cacheKey + "LFIndex", lfIndex);
     }
 
     #region 字符转换

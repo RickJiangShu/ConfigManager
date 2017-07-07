@@ -7,8 +7,9 @@ Config Manager 2开发计划
 * 整合ConfigEditor								OK
 * 删除ConfigManagerSettings						OK
 * 取消MenuItem									OK
-* 设置 换行符、制表符
-* 支持 cvs 格式
+* 设置 换行符、制表符							OK
+* 支持 cvs 格式									OK
+整合 ConfigParser
 
 
 * 将文件写入切割出来	ConfigParser 解析器
@@ -36,3 +37,14 @@ Config Manager 2开发计划
 Config		指原始配置文件（目前只支持.txt）
 Getter		指输出的.cs文件
 Manager		指ConfigManager
+CType		配置类型
+CValue		配置值
+
+
+模板定义：
+ClassName					类名
+PropertiesDeclaration		属性声明
+ID							身份索引
+IDType						索引类型
+IDField						索引标识符
+PropertiesParse				属性的解析过程

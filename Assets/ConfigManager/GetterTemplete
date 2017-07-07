@@ -10,15 +10,15 @@ public class /*ClassName*/
 	/*PropertiesDeclaration*/
 
 	#region 静态方法
-	public static Dictionary</*IdType*/, /*ClassName*/> Map;
+	public static Dictionary</*IDType*/, /*ClassName*/> Map;
 
-	public static /*ClassName*/ Get(/*IdType*/ /*IdField*/)
+	public static /*ClassName*/ Get(/*IDType*/ /*IDField*/)
 	{
-		return Map[/*IdField*/];
+		return Map[/*IDField*/];
 	}
 	public static void Parse(string cfgStr)
 	{
-		Map = new Dictionary</*IdType*/, /*ClassName*/>();
+		Map = new Dictionary</*IDType*/, /*ClassName*/>();
 		string[][] configArray = ConfigUtils.ParseConfig(cfgStr);
 		int len = configArray.Length;
         
@@ -29,7 +29,7 @@ public class /*ClassName*/
 			
 			/*PropertiesParse*/
 			
-			Map[cfg./*IdField*/] = cfg;
+			Map[cfg./*IDField*/] = cfg;
 		}
 	}
 	#endregion

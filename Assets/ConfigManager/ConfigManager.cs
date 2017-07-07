@@ -11,7 +11,7 @@ using UnityEngine;
 /// <summary>
 /// 主控类，提供获取各个配置的接口，自动解析
 /// </summary>
-[System]
+[System.Serializable]
 public class ConfigManager
 {
 

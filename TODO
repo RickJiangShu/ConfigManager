@@ -7,6 +7,14 @@ Config Manager 2开发计划
 * 整合ConfigEditor								OK
 * 删除ConfigManagerSettings						OK
 * 取消MenuItem									OK
+* 设置 换行符、制表符
+* 支持 cvs 格式
+
+
+* 将文件写入切割出来	ConfigParser 解析器
+* 删除ConfigUtils
+
+* 序列化测试
 
 编写ConfigManager 示例
 
@@ -22,3 +30,9 @@ Config Manager 2开发计划
 
 4、支持CVS格式 
 
+
+
+内部定义：
+Config		指原始配置文件（目前只支持.txt）
+Getter		指输出的.cs文件
+Manager		指ConfigManager

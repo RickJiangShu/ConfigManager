@@ -14,42 +14,33 @@ using System.Text.RegularExpressions;
 /// </summary>
 public class ConfigParser
 {
+    private const string fieldDeclaration = "public {0} {1};//{2}";//属性声明模板
+    private const string propertyParse = "item.{0} = {1}(args[{2}]);";//属性解析
+
     /// <summary>
     /// 解析Getter
     /// </summary>
     /// <returns></returns>
     public static string ParseGetter(string input, string textTemplete, string ClassName, string sv, string lf)
     {
-        string[,] matrix = Config2Matrix(input, sv, lf);
+        int row; int col;
+        string[,] matrix = Config2Matrix(input, sv, lf, out row, out col);
 
         //属性声明
-        string IdField = "";//ID或者索引的标识符
-        string PropertiesDeclaration = "";
-        string declarationTemplete = "public {0} {1};//{2}";
- //       string[] propertiesComments = matrix[0];//属性注释
- //       string[] propertiesType = matrix[1];//属性的类型
-
-        //数组类型
-     //   propertiesType = Array.ConvertAll<string, string>(propertiesType, s => String2Type(s));//将Type标识符转换为C#对应的类型
-   //     string[] propertiesId = configArray[2];//属性的标识符
-    //    string IdType = propertiesType[0];
+        string propertiesDeclaration = "";
+        for (int x = 0; x < col; x++)
+        {
+            string comment = matrix[0,x];
+            string field = matrix[1, x];
+            string csType = ConfigType2CSharpType(matrix[2, x]);
+            string declaration = string.Format(fieldDeclaration, csType, field, comment);
+            propertiesDeclaration += declaration + lf;
+        }
 
         //属性解析过程
-        string propertiesParse = "";
-        string parseTemplete = "cfg.{0} = {1}(args[{2}]);";
-        string parseTemplete_Array = "cfg.{0} = ConfigUtils.ParseArray<{1}>(args[{2}], {3});";//0 field 1 baseType 2 idx 3 ParseFunc
-        for (int i = 0, l = propertiesId.Length; i < l; i++)
-        {
-            string baseType;
-            if (IsArrayType(propertiesType[i], out baseType))
-            {
-                propertiesParse += string.Format(parseTemplete_Array, propertiesId[i], baseType, i, BaseType2ParseFunc(baseType)) + "\r\n\t\t\t";
-            }
-            else
-            {
-                propertiesParse += string.Format(parseTemplete, propertiesId[i], BaseType2ParseFunc(propertiesType[i]), i) + "\r\n\t\t\t";
-            }
-        }
+        string propertiesParseProcess;
+
+        
     }
 
     /// <summary>
@@ -62,6 +53,74 @@ public class ConfigParser
         return "";
     }
 
+    /// <summary>
+    /// 将类型字符串转换为C#基础类型
+    /// </summary>
+    /// <param name="str"></param>
+    /// <returns></returns>
+    private static string ConfigType2CSharpType(string configType)
+    {
+        string csharpType;
+        switch (configType)
+        {
+            case "bool":
+                csharpType = "bool";
+                break;
+            case "uint8":
+                csharpType = "byte";
+                break;
+            case "uint16":
+                csharpType = "ushort";
+                break;
+            case "uint":
+            case "uint32":
+                csharpType = "uint";
+                break;
+            case "int8":
+                csharpType = "sbyte";
+                break;
+            case "int16":
+                csharpType = "short";
+                break;
+            case "int32":
+            case "int":
+                csharpType = "int";
+                break;
+            case "long":
+                csharpType = "long";
+                break;
+            case "ulong":
+                csharpType = "ulong";
+                break;
+            case "float":
+                csharpType = "float";
+                break;
+            case "double":
+                csharpType = "double";
+                break;
+            case "string":
+                csharpType = "string";
+                break;
+            default:
+                csharpType = configType;
+                break;
+        }
+        if (IsArrayType(configType))
+        {
+            csharpType += "[]";
+        }
+        return csharpType;
+    }
+
+    /// <summary>
+    /// 判断是否是数组类型
+    /// </summary>
+    /// <returns></returns>
+    private static bool IsArrayType(string str)
+    {
+        int idx = str.LastIndexOf('[');
+        return idx != -1;
+    }
 
     /// <summary>
     /// 从配置转换成矩阵数组（0行1列）
@@ -70,15 +129,15 @@ public class ConfigParser
     /// <param name="sv">分隔符 Separated Values</param>
     /// <param name="lf">换行符 Line Feed</param>
     /// <returns></returns>
-    private static string[,] Config2Matrix(string config, string sv, string lf)
+    private static string[,] Config2Matrix(string config, string sv, string lf,out int row,out int col)
     {
         config = config.Trim();//清空末尾的空白
         
         string[] lines = Regex.Split(config, lf);
         string[] firstLine = Regex.Split(lines[0], sv);
-        int rowCount = lines.Length;
-        int columnCount = firstLine.Length;
-        string[,] matrix = new string[rowCount, columnCount];
+        row = lines.Length;
+        col = firstLine.Length;
+        string[,] matrix = new string[row, col];
         //为第一行赋值
         for (int i = 0, l = firstLine.Length; i < l; i++)
         {
@@ -103,7 +162,7 @@ public class ConfigParser
     /// <param name="cValue"></param>
     /// <param name="converter"></param>
     /// <returns></returns>
-    private static T[] CValue2Array<T>(string cValue, Func<string, T> converter)
+    private static T[] ConfigValue2Array<T>(string cValue, Func<string, T> converter)
     {
         if (string.IsNullOrEmpty(cValue) || cValue == "0") return null;
 

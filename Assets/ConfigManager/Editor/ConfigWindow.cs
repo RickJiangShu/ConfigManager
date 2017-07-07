@@ -225,23 +225,7 @@ public class ConfigWindow : EditorWindow
         return config;
     }
 
-    /// <summary>
-    /// 将类型字符串转换为C#类型字符串
-    /// </summary>
-    /// <param name="str"></param>
-    /// <returns></returns>
-    private static string String2Type(string str)
-    {
-        string baseType;
-        if (IsArrayType(str, out baseType))
-        {
-            return String2BaseType(baseType) + "[]";
-        }
-        else
-        {
-            return String2BaseType(str);
-        }
-    }
+    
 
     /// <summary>
     /// 将类型字符串转换为C#基础类型

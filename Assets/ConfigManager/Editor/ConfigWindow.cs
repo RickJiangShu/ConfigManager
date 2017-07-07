@@ -79,6 +79,7 @@ public class ConfigWindow : EditorWindow
         if (Directory.Exists(outputPath))
         {
             Directory.Delete(outputPath, true);
+            AssetDatabase.Refresh();
         }
     }
 
@@ -123,7 +124,10 @@ public class ConfigWindow : EditorWindow
             }
             StreamWriter writer = new StreamWriter(stream);
             writer.Write(config);
+            writer.Close();
         }
+
+        AssetDatabase.Refresh();
     }
 
     #region 字符转换

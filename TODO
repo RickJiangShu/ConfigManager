@@ -1,6 +1,15 @@
 2017/7/6 星期四
 Config Manager 2开发计划
 
+* 开发ConfigWindow							OK
+* 将ConfigEditor 整合进 ConfigWindow
+* 直接删除FileUtils，不依赖，直接调用底层API
+* 整合ConfigEditor
+* 删除ConfigManagerSettings
+* 取消MenuItem
+
+编写ConfigManager 示例
+
 1、优化运行时解析速度
 	* 设计思路：在编辑器下将txt文件解析并序列化成二进制文件，运行时直接加载二进制文件即可无需解析。
 	使用UnityEditor.SerializedObject 序列化文件

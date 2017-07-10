@@ -17,22 +17,24 @@ namespace ConfigManagerEditor
     /// </summary>
     public class ConfigWindow : EditorWindow
     {
-        private static string cacheKey = "ConfigManagerCache_";
+        private const string cacheKey = "ConfigManagerCache";
+        private const string assetName = "SerializableSet.asset";
 
         private static bool justRecompiled;
+
         static ConfigWindow()
         {
             justRecompiled = true;
         }
 
         [MenuItem("Window/ConfigManager")]
-        static void ShowWindow()
+        public static ConfigWindow Get()
         {
-            EditorWindow.GetWindow<ConfigWindow>("ConfigManager");
+            return EditorWindow.GetWindow<ConfigWindow>("ConfigManager");
         }
 
         //
-        private string[] configTypeOptions = new string[] { "txt(tsv)", "csv" };
+        private string[] sourceTypeOptions = new string[] { "txt(tsv)", "csv" };
         private string[] lfOptions = new string[] { "CR LF", "LF" };
 
         /// <summary>
@@ -44,31 +46,31 @@ namespace ConfigManagerEditor
         /// </summary>
         private string[] lineFeed = new string[] { "\r\n", "\n" };
 
-        //
-        private string sourceFolder;
-        private string outputFolder;
-        private int configTypeIndex;
-        private int lfIndex;
+        /// <summary>
+        /// 缓存数据
+        /// </summary>
+        public Cache cache;
 
         void Awake()
         {
-            LoadCacheOrInit();
+            LoadCache();
         }
 
 
-        void OnGUI()
+        public void OnGUI()
         {
             //Base Settings
             GUILayout.Label("Base Settings", EditorStyles.boldLabel);
 
-            sourceFolder = EditorGUILayout.TextField("Source Folder", sourceFolder);
-            outputFolder = EditorGUILayout.TextField("Output Folder", outputFolder);
+            cache.sourceFolder = EditorGUILayout.TextField("Source Folder", cache.sourceFolder);
+            cache.configOutputFolder = EditorGUILayout.TextField("Config Output", cache.configOutputFolder);
+            cache.assetOutputFolder = EditorGUILayout.TextField("Asset Output", cache.assetOutputFolder);
 
             //Config Type
-            configTypeIndex = EditorGUILayout.Popup("Config Type", configTypeIndex, configTypeOptions);
+            cache.sourceTypeIndex = EditorGUILayout.Popup("Source Type", cache.sourceTypeIndex, sourceTypeOptions);
 
             //LF
-            lfIndex = EditorGUILayout.Popup("End of Line", lfIndex, lfOptions);
+            cache.lineFeedIndex = EditorGUILayout.Popup("End of Line", cache.lineFeedIndex, lfOptions);
 
             //Operation
             EditorGUILayout.Space();
@@ -97,12 +99,23 @@ namespace ConfigManagerEditor
         /// </summary>
         private void ClearOutput()
         {
-            if (Directory.Exists(outputFolder))
+            //Clear Config
+            if (Directory.Exists(cache.configOutputFolder))
             {
-                Directory.Delete(outputFolder, true);
-                File.Delete(outputFolder + ".meta");
-                AssetDatabase.Refresh();
+                Directory.Delete(cache.configOutputFolder, true);
+                File.Delete(cache.configOutputFolder + ".meta");
+
             }
+
+            ////Clear Asset
+            string assetPath = cache.assetOutputFolder + "/" + assetName;
+            if(File.Exists(assetPath))
+            {
+                File.Delete(assetPath);
+                File.Delete(assetPath + ".meta");
+            }
+            
+            AssetDatabase.Refresh();
         }
 
         /// <summary>
@@ -111,8 +124,8 @@ namespace ConfigManagerEditor
         private void Output()
         {
             //检出输出目录
-            if (!Directory.Exists(outputFolder))
-                Directory.CreateDirectory(outputFolder);
+            if (!Directory.Exists(cache.configOutputFolder))
+                Directory.CreateDirectory(cache.configOutputFolder);
 
             //读取模板文件
             string getterTempletePath = Application.dataPath + "/ConfigManager/GetterTemplete";
@@ -122,10 +135,10 @@ namespace ConfigManagerEditor
             List<Source> sources = GetSources();
 
             //生产Configs
-            ConfigGenerator.Generate(sources, outputFolder);
+            ConfigGenerator.Generate(sources, cache.configOutputFolder);
 
             //生产SerializableSet
-            SerializableSetGenerator.Generate(sources, outputFolder);
+            SerializableSetGenerator.Generate(sources, cache.configOutputFolder);
 
             //生产Deserializer
 
@@ -156,7 +169,7 @@ namespace ConfigManagerEditor
 
                 //通过反射序列化
                 UnityEngine.Object set = (UnityEngine.Object)Serializer.Serialize(sources);
-                string o = outputFolder + "/SerializableSet.asset";
+                string o = cache.assetOutputFolder + "/" + assetName;
                 AssetDatabase.CreateAsset(set, o);
             }
             justRecompiled = false;
@@ -165,30 +178,25 @@ namespace ConfigManagerEditor
         /// <summary>
         /// 加载缓存或初始化
         /// </summary>
-        private void LoadCacheOrInit()
+        private void LoadCache()
         {
-            //取缓存
-            sourceFolder = PlayerPrefs.GetString(cacheKey + "SourceFolder");
-            outputFolder = PlayerPrefs.GetString(cacheKey + "OutputFolder");
-            configTypeIndex = PlayerPrefs.GetInt(cacheKey + "ConfigTypeIndex");
-            lfIndex = PlayerPrefs.GetInt(cacheKey + "LFIndex");
-
-            //设置缺省值
-            if (string.IsNullOrEmpty(sourceFolder))
-                sourceFolder = "Assets/Resources/Config";
-            if (string.IsNullOrEmpty(outputFolder))
-                outputFolder = "Assets/Resources/ConfigOutput";
+            if (PlayerPrefs.HasKey(cacheKey))
+            {
+                cache = JsonUtility.FromJson<Cache>(PlayerPrefs.GetString(cacheKey));
+            }
+            else
+            {
+                cache = new Cache();
+            }
         }
 
         /// <summary>
         /// 保存缓存
         /// </summary>
-        private void SaveCache()
+        public void SaveCache()
         {
-            PlayerPrefs.SetString(cacheKey + "InputPath", sourceFolder);
-            PlayerPrefs.SetString(cacheKey + "OutputPath", outputFolder);
-            PlayerPrefs.SetInt(cacheKey + "ConfigTypeIndex", configTypeIndex);
-            PlayerPrefs.SetInt(cacheKey + "LFIndex", lfIndex);
+            string json = JsonUtility.ToJson(cache);
+            PlayerPrefs.SetString(cacheKey, json);
         }
 
 
@@ -199,12 +207,12 @@ namespace ConfigManagerEditor
         private List<Source> GetSources()
         {
             //获取所有配置文件
-            DirectoryInfo directory = new DirectoryInfo(sourceFolder);
+            DirectoryInfo directory = new DirectoryInfo(cache.sourceFolder);
             FileInfo[] files = directory.GetFiles("*.txt", SearchOption.AllDirectories);
 
             //设置
-            string sv = separatedValues[configTypeIndex];
-            string lf = lineFeed[lfIndex];
+            string sv = separatedValues[cache.sourceTypeIndex];
+            string lf = lineFeed[cache.lineFeedIndex];
 
             //源
             List<Source> sources = new List<Source>();
@@ -225,4 +233,16 @@ namespace ConfigManagerEditor
             return sources;
         }
     }
+
+    [System.Serializable]
+    public class Cache
+    {
+        public string sourceFolder = "Assets/Config";
+        public string configOutputFolder = "Assets/Scripts/Config";
+        public string assetOutputFolder = "Assets/Resources/";
+
+        public int sourceTypeIndex;
+        public int lineFeedIndex;
+    }
 }
+

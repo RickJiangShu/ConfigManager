@@ -4,299 +4,225 @@
  * Email:   rickjiangshu@gmail.com
  * Follow:  https://github.com/RickJiangShu
  */
-using UnityEngine;
-using UnityEditor;
-using System;
-using System.IO;
-
-/// <summary>
-/// ConfigManager窗口
-/// </summary>
-public class ConfigWindow : EditorWindow
+namespace ConfigManagerEditor
 {
-    private static string cacheKey = "ConfigManagerCache_";
-
-    [MenuItem("Window/ConfigManager")]
-    static void ShowWindow()
-    {
-        EditorWindow.GetWindow<ConfigWindow>("ConfigManager");
-    }
-
-    //
-    private string[] configTypeOptions = new string[] { "txt(tsv)", "csv" };
-    private string[] lfOptions = new string[] { "CR LF", "LF" };
+    using UnityEngine;
+    using UnityEditor;
+    using System;
+    using System.IO;
+    using System.Collections.Generic;
 
     /// <summary>
-    /// 对应ConfigType的分隔符
+    /// ConfigManager窗口
     /// </summary>
-    private string[] separatedValues = new string[] { "\t", "," };
-    /// <summary>
-    /// 对应lfOptions的换行符
-    /// </summary>
-    private string[] lineFeed = new string[] { "\r\n", "\n" };
-
-    //
-    private string inputPath;
-    private string outputPath;
-    private int configTypeIndex;
-    private int lfIndex;
-
-    void Awake()
+    public class ConfigWindow : EditorWindow
     {
-        LoadCacheOrInit();
-    }
+        private static string cacheKey = "ConfigManagerCache_";
 
-
-    void OnGUI()
-    {
-        //Base Settings
-        GUILayout.Label("Base Settings", EditorStyles.boldLabel);
-
-        inputPath = EditorGUILayout.TextField("Input Path", inputPath);
-        outputPath = EditorGUILayout.TextField("Output Path", outputPath);
-
-        //Config Type
-        configTypeIndex = EditorGUILayout.Popup("Config Type", configTypeIndex, configTypeOptions);
-
-        //LF
-        lfIndex = EditorGUILayout.Popup("End of Line", lfIndex, lfOptions);
-
-        //Operation
-        EditorGUILayout.Space();
-        GUILayout.Label("Operation", EditorStyles.boldLabel);
-
-        if (GUILayout.Button("Clear Output"))
+        private static bool justRecompiled;
+        static ConfigWindow()
         {
-            ClearOutput();
+            justRecompiled = true;
         }
 
-        if(GUILayout.Button("Output"))
+        [MenuItem("Window/ConfigManager")]
+        static void ShowWindow()
         {
-            Output();
+            EditorWindow.GetWindow<ConfigWindow>("ConfigManager");
         }
 
-        //缓存设置
-        if (GUI.changed)
-        {
-            SaveCache();
-        }
-    }
+        //
+        private string[] configTypeOptions = new string[] { "txt(tsv)", "csv" };
+        private string[] lfOptions = new string[] { "CR LF", "LF" };
 
-    /// <summary>
-    /// 清空输出目录
-    /// </summary>
-    private void ClearOutput()
-    {
-        if (Directory.Exists(outputPath))
+        /// <summary>
+        /// 对应ConfigType的分隔符
+        /// </summary>
+        private string[] separatedValues = new string[] { "\t", "," };
+        /// <summary>
+        /// 对应lfOptions的换行符
+        /// </summary>
+        private string[] lineFeed = new string[] { "\r\n", "\n" };
+
+        //
+        private string sourceFolder;
+        private string outputFolder;
+        private int configTypeIndex;
+        private int lfIndex;
+
+        void Awake()
         {
-            Directory.Delete(outputPath, true);
+            LoadCacheOrInit();
+        }
+
+
+        void OnGUI()
+        {
+            //Base Settings
+            GUILayout.Label("Base Settings", EditorStyles.boldLabel);
+
+            sourceFolder = EditorGUILayout.TextField("Source Folder", sourceFolder);
+            outputFolder = EditorGUILayout.TextField("Output Folder", outputFolder);
+
+            //Config Type
+            configTypeIndex = EditorGUILayout.Popup("Config Type", configTypeIndex, configTypeOptions);
+
+            //LF
+            lfIndex = EditorGUILayout.Popup("End of Line", lfIndex, lfOptions);
+
+            //Operation
+            EditorGUILayout.Space();
+            GUILayout.Label("Operation", EditorStyles.boldLabel);
+
+            if (GUILayout.Button("Clear Output"))
+            {
+                ClearOutput();
+            }
+
+            if (GUILayout.Button("Output"))
+            {
+                Output();
+            }
+
+
+            //缓存设置
+            if (GUI.changed)
+            {
+                SaveCache();
+            }
+        }
+
+        /// <summary>
+        /// 清空输出目录
+        /// </summary>
+        private void ClearOutput()
+        {
+            if (Directory.Exists(outputFolder))
+            {
+                Directory.Delete(outputFolder, true);
+                File.Delete(outputFolder + ".meta");
+                AssetDatabase.Refresh();
+            }
+        }
+
+        /// <summary>
+        /// 输出文件
+        /// </summary>
+        private void Output()
+        {
+            //检出输出目录
+            if (!Directory.Exists(outputFolder))
+                Directory.CreateDirectory(outputFolder);
+
+            //读取模板文件
+            string getterTempletePath = Application.dataPath + "/ConfigManager/GetterTemplete";
+            string getterTemplete = File.ReadAllText(getterTempletePath);
+
+            //源
+            List<Source> sources = GetSources();
+
+            //生产Configs
+            ConfigGenerator.Generate(sources, outputFolder);
+
+            //生产SerializableSet
+            SerializableSetGenerator.Generate(sources, outputFolder);
+
+            //生产Deserializer
+
+
+            //刷新
             AssetDatabase.Refresh();
+
+            //等待序列化
+            waitingForSerialize = true;
         }
-    }
 
-    /// <summary>
-    /// 输出文件
-    /// </summary>
-    private void Output()
-    {
-        //检出输出目录
-        if (!Directory.Exists(outputPath))
-            Directory.CreateDirectory(outputPath);
 
-        //读取模板文件
-        string getterTempletePath = Application.dataPath + "/ConfigManager/GetterTemplete";
-        string getterTemplete = File.ReadAllText(getterTempletePath);
+        /// <summary>
+        /// 是否正在等待序列化（新生成脚本需要编译）
+        /// </summary>
+        private bool waitingForSerialize = false;
 
-        //获取所有配置文件
-        DirectoryInfo directory = new DirectoryInfo(inputPath);
-        FileInfo[] files = directory.GetFiles("*.txt", SearchOption.AllDirectories);
-
-        for (int i = 0, l = files.Length; i < l; i++)
+        void Update()
         {
-            FileInfo file = files[i];
-            StreamReader txtStream = file.OpenText();
-            string FileName = file.Name.Replace(file.Extension, "");
-            string ClassName = FileName + "Config";
-            string outputFilePath = outputPath + "/" + ClassName + ".cs";//输出文件名
-            string fileString = txtStream.ReadToEnd();
-            string config = String2Config(fileString, getterTemplete, ClassName);//C#代码
-
-            txtStream.Close();//关闭txt文件流
-
-            //文件写入
-            FileStream stream;
-            if (!File.Exists(outputFilePath))
+            if (justRecompiled && waitingForSerialize)
             {
-                stream = File.Create(outputFilePath);
+                UnityEngine.Debug.Log("配置开始序列化！");
+
+                waitingForSerialize = false;
+
+                //无法缓存只能重新获取
+                List<Source> sources = GetSources();
+
+                //通过反射序列化
+                UnityEngine.Object set = (UnityEngine.Object)Serializer.Serialize(sources);
+                string o = outputFolder + "/SerializableSet.asset";
+                AssetDatabase.CreateAsset(set, o);
             }
-            else
+            justRecompiled = false;
+        }
+
+        /// <summary>
+        /// 加载缓存或初始化
+        /// </summary>
+        private void LoadCacheOrInit()
+        {
+            //取缓存
+            sourceFolder = PlayerPrefs.GetString(cacheKey + "SourceFolder");
+            outputFolder = PlayerPrefs.GetString(cacheKey + "OutputFolder");
+            configTypeIndex = PlayerPrefs.GetInt(cacheKey + "ConfigTypeIndex");
+            lfIndex = PlayerPrefs.GetInt(cacheKey + "LFIndex");
+
+            //设置缺省值
+            if (string.IsNullOrEmpty(sourceFolder))
+                sourceFolder = "Assets/Resources/Config";
+            if (string.IsNullOrEmpty(outputFolder))
+                outputFolder = "Assets/Resources/ConfigOutput";
+        }
+
+        /// <summary>
+        /// 保存缓存
+        /// </summary>
+        private void SaveCache()
+        {
+            PlayerPrefs.SetString(cacheKey + "InputPath", sourceFolder);
+            PlayerPrefs.SetString(cacheKey + "OutputPath", outputFolder);
+            PlayerPrefs.SetInt(cacheKey + "ConfigTypeIndex", configTypeIndex);
+            PlayerPrefs.SetInt(cacheKey + "LFIndex", lfIndex);
+        }
+
+
+        /// <summary>
+        /// 获取所有源
+        /// </summary>
+        /// <returns></returns>
+        private List<Source> GetSources()
+        {
+            //获取所有配置文件
+            DirectoryInfo directory = new DirectoryInfo(sourceFolder);
+            FileInfo[] files = directory.GetFiles("*.txt", SearchOption.AllDirectories);
+
+            //设置
+            string sv = separatedValues[configTypeIndex];
+            string lf = lineFeed[lfIndex];
+
+            //源
+            List<Source> sources = new List<Source>();
+            for (int i = 0, l = files.Length; i < l; i++)
             {
-                stream = File.OpenWrite(outputFilePath);
+                Source source = new Source();
+                FileInfo file = files[i];
+                StreamReader contentStream = file.OpenText();
+
+                source.content = contentStream.ReadToEnd();//内容
+                source.sourceName = file.Name.Replace(file.Extension, "");//文件名
+                source.configName = source.sourceName + "Config";//类名
+                source.matrix = ConfigTools.Content2Matrix(source.content, sv, lf, out source.row, out source.column);
+
+                contentStream.Close();//关闭txt文件流
+                sources.Add(source);
             }
-            StreamWriter writer = new StreamWriter(stream);
-            writer.Write(config);
-            writer.Close();
-        }
-
-        AssetDatabase.Refresh();
-    }
-
-    /// <summary>
-    /// 加载缓存或初始化
-    /// </summary>
-    private void LoadCacheOrInit()
-    {
-        //取缓存
-        inputPath = PlayerPrefs.GetString(cacheKey + "InputPath");
-        outputPath = PlayerPrefs.GetString(cacheKey + "OutputPath");
-        configTypeIndex = PlayerPrefs.GetInt(cacheKey + "ConfigTypeIndex");
-        lfIndex = PlayerPrefs.GetInt(cacheKey + "LFIndex");
-
-        //设置缺省值
-        if (string.IsNullOrEmpty(inputPath))
-            inputPath = "Assets/Resources/Config";
-        if (string.IsNullOrEmpty(outputPath))
-            outputPath = "Assets/Resources/ConfigOutput";
-    }
-    /// <summary>
-    /// 保存缓存
-    /// </summary>
-    private void SaveCache()
-    {
-        PlayerPrefs.SetString(cacheKey + "InputPath", inputPath);
-        PlayerPrefs.SetString(cacheKey + "OutputPath", outputPath);
-        PlayerPrefs.SetInt(cacheKey + "ConfigTypeIndex", configTypeIndex);
-        PlayerPrefs.SetInt(cacheKey + "LFIndex", lfIndex);
-    }
-
-    #region 字符转换
-
-    /// <summary>
-    /// 配置文本->配置代码
-    /// </summary>
-    /// <returns></returns>
-    private static string String2Config(string str, string textTemplete, string ClassName)
-    {
-        string[][] configArray = ConfigUtils.ParseConfig(str);
-
-        //属性声明
-        string IdField = "";//ID或者索引的标识符
-        string PropertiesDeclaration = "";
-        string declarationTemplete = "public {0} {1};//{2}";
-        string[] propertiesComments = configArray[0];
-        string[] propertiesType = configArray[1];//属性的类型
-
-        //数组类型
-        propertiesType = Array.ConvertAll<string, string>(propertiesType, s => String2Type(s));//将Type标识符转换为C#对应的类型
-        string[] propertiesId = configArray[2];//属性的标识符
-        string IdType = propertiesType[0];
-
-        for (int i = 0, l = propertiesId.Length; i < l; i++)
-        {
-            if (i == 0) IdField = propertiesId[i];
-            PropertiesDeclaration += string.Format(declarationTemplete, propertiesType[i], propertiesId[i], propertiesComments[i]) + "\r\n\t";
-        }
-
-        //属性解析
-        string PropertiesParse = "";
-        string parseTemplete = "cfg.{0} = {1}(args[{2}]);";
-        string parseTemplete_Array = "cfg.{0} = ConfigUtils.ParseArray<{1}>(args[{2}], {3});";//0 field 1 baseType 2 idx 3 ParseFunc
-        for (int i = 0, l = propertiesId.Length; i < l; i++)
-        {
-            string baseType;
-            if (IsArrayType(propertiesType[i], out baseType))
-            {
-                PropertiesParse += string.Format(parseTemplete_Array, propertiesId[i], baseType, i, BaseType2ParseFunc(baseType)) + "\r\n\t\t\t";
-            }
-            else
-            {
-                PropertiesParse += string.Format(parseTemplete, propertiesId[i], BaseType2ParseFunc(propertiesType[i]), i) + "\r\n\t\t\t";
-            }
-        }
-
-        //写入模板文件
-        string config = textTemplete;
-        config = config.Replace("/*ClassName*/", ClassName);
-        config = config.Replace("/*IdType*/", IdType);
-        config = config.Replace("/*PropertiesDeclaration*/", PropertiesDeclaration);
-        config = config.Replace("/*PropertiesParse*/", PropertiesParse);
-        config = config.Replace("/*IdField*/", IdField);
-
-        return config;
-    }
-
-    
-
-    /// <summary>
-    /// 将类型字符串转换为C#基础类型
-    /// </summary>
-    /// <param name="str"></param>
-    /// <returns></returns>
-    private static string String2BaseType(string str)
-    {
-        switch (str)
-        {
-            case "bool":
-                return "bool";
-            case "uint8":
-                return "byte";
-            case "uint16":
-                return "ushort";
-            case "uint":
-            case "uint32":
-                return "uint";
-            case "int8":
-                return "sbyte";
-            case "int16":
-                return "short";
-            case "int32":
-            case "int":
-                return "int";
-            case "long":
-                return "long";
-            case "ulong":
-                return "ulong";
-            case "float":
-                return "float";
-            case "double":
-                return "double";
-            case "string":
-                return "string";
-            default:
-                return str;
+            return sources;
         }
     }
-
-    private static string BaseType2ParseFunc(string baseType)
-    {
-        if (baseType == "string")
-            return "Convert.ToString";
-        else
-            return baseType + ".Parse";
-    }
-
-    /// <summary>
-    /// 判断是否是数组类型
-    /// </summary>
-    /// <returns></returns>
-    private static bool IsArrayType(string str)
-    {
-        int idx = str.LastIndexOf('[');
-        return idx != -1;
-    }
-    private static bool IsArrayType(string str, out string baseType)
-    {
-        int idx = str.LastIndexOf('[');
-        if (idx != -1)
-        {
-            baseType = str.Substring(0, idx);
-        }
-        else
-        {
-            baseType = "";
-        }
-        return idx != -1;
-    }
-
-    #endregion
 }

@@ -1,23 +1,36 @@
 2017/7/6 星期四
 Config Manager 2开发计划
 
-* 开发ConfigWindow								OK
-* 将ConfigEditor 整合进 ConfigWindow			OK
-* 直接删除FileUtils，不依赖，直接调用底层API	OK
-* 整合ConfigEditor								OK
-* 删除ConfigManagerSettings						OK
-* 取消MenuItem									OK
-* 设置 换行符、制表符							OK
-* 支持 cvs 格式									OK
-整合 ConfigParser 就用 Matrix out row out col
+* 开发ConfigWindow									OK
+* 将ConfigEditor 整合进 ConfigWindow				OK
+* 直接删除FileUtils，不依赖，直接调用底层API		OK
+* 整合ConfigEditor									OK
+* 删除ConfigManagerSettings							OK
+* 取消MenuItem										OK
+* 设置 换行符、制表符								OK
+* 支持 cvs 格式										OK
+* 整合 ConfigParser 就用 Matrix out row out col		OK
+
+* 切分Source和Config的概念							OK
+* 不用在Getter里写解析方法了						OK
+* 将模板放入“解析器”内部							OK
+
+* 异步编译											OK
+* 模板变量声明优化 /// <summary>					OK
+* 序列化测试										OK
+
+
+
+* 解析器
+* 选择Asset输出路径
+
+* 类型转换太乱了，要简化
+
 
 
 * 将文件写入切割出来	ConfigParser 解析器
-* 删除ConfigUtils
 
 
-* 模板变量声明优化 /// <summary>
-* 序列化测试
 
 
 编写ConfigManager 示例
@@ -34,22 +47,92 @@ Config Manager 2开发计划
 
 4、支持CVS格式 
 
+*.txt -> Serializer -> SerializableList -> Load -> Deserializer -> [Config].dict 
+建立 Deserializer 反序列化器
+
+Names Values
+
+在每个Config里建立一个字典，用Get方法获取
+
+Process：
+
+从SourceFiles -> ParserInputDatas
+	ConfigParser()
+	SerializerParser()
+	SerializableDataParser()
+	DeseriazlierParser()
+
+
+嵌套的层次太多，有点乱
+	ParserInputData			解析器输入文件
+		SourceFileData		源文件数据
+
+
+SerializerParser()
+	SingleSourceParser()	单个
+
 
 
 内部定义：
-Source			（修）
-Config				指原始配置文件
-ConfigItem（item）	单个配置对象		
-Getter				指输出的.cs文件
+Source				指原始的配置文件
+Config				指输出的配置文件		
+//Getter				指输出的.cs文件
 Manager				指ConfigManager
-ConfigType（CT）	配置类型
-ConfigValue（CV）	配置值
+
+SourceType			源类型
+SourceBType			特指源基础类型
+SourceAType			特指源数组类型
+
+ConfigType			生成配置文件类型字符串
+ConfigBType			其基础类型
+ConfigAType			其数组类型
+
+Type				System.Type
+BType				基础类型
+AType				数组类型
+
+
+ObjectType			Type
+
+
+
+SourceValue			配置值
+
+
+
+BaseType			C#基础类
+ArrayType			C#数组类
+
 CSharpType(CST)		C#类型
 
-模板定义：
+Parser				解析器，给定输入，输出解析出来的字符串
+ConfigParser		解析Config
+
+Output				所有的Parse输出
+
+Configs				指Config数组
+Ser
+
+
+Config模板定义：
 ClassName					类名
 PropertiesDeclaration		属性声明
 ID							身份索引
 IDType						索引类型
 IDField						索引标识符
 PropertiesParseProcess		属性的解析过程
+
+
+Serializer模板定义：
+ConfigName					配置类名
+SourceName					原始文件名
+
+
+
+Q&A
+
+* 为什么需要 序列化、反序列化 这两个步骤？
+* 因为[System.Serializable]不支持字典。
+
+* 为什么要动态解析 Serializer、SerializableList、Deseriazlier？
+* 因为如果不动态解析，就要使用反射去反序列化Config，那样太慢了。

@@ -1,4 +1,5 @@
 # ConfigManager
+注意master正在合并中。。。上次的发行版本请使用v1
 
 ## 简介
 ConfigManager使开发人员一键导入并使用配置文件。<br>

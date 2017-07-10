@@ -1,4 +1,0 @@
-﻿测试所有类型	布尔	uint8	uint16	uint32	int8	int16	int32	long	ulong	float	double	string	int数组	uint数组	string数组
-string	bool	uint8	uint16	uint32	int8	int16	int32	long	ulong	float	double	string	int[]	uint[]	string[]
-id	p1	p2	p3	p4	p5	p6	p7	p8	p9	p10	p11	p12	p13	p14	p15
-1	TRUE	1	2	3	4	-1	-2	-3	10000	100000	1.05	1.3333	-1,-2,-3	1,2,3	1,2,3

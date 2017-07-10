@@ -31,6 +31,9 @@ Config Manager 2开发计划
 * 将文件写入切割出来	ConfigParser 解析器
 
 
+* 写文档
+* 写宣传
+
 
 
 编写ConfigManager 示例
@@ -130,7 +133,6 @@ SourceName					原始文件名
 
 
 Q&A
-
 * 为什么需要 序列化、反序列化 这两个步骤？
 * 因为[System.Serializable]不支持字典。
 

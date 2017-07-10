@@ -169,7 +169,8 @@ namespace ConfigManagerEditor
             switch (sourceType)
             {
                 case "bool":
-                    return bool.Parse(sourceValue);
+                    return sourceValue != "0" && sourceValue != "false" && sourceValue != "False" && sourceValue != "FALSE";
+                   // return bool.Parse(sourceValue);
                 case "uint8":
                     return byte.Parse(sourceValue);
                 case "uint16":

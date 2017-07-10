@@ -76,6 +76,11 @@ namespace ConfigManagerEditor
             EditorGUILayout.Space();
             GUILayout.Label("Operation", EditorStyles.boldLabel);
 
+            if (GUILayout.Button("Serialize"))
+            {
+                Serialize();
+            }
+
             if (GUILayout.Button("Clear Output"))
             {
                 ClearOutput();
@@ -127,10 +132,6 @@ namespace ConfigManagerEditor
             if (!Directory.Exists(cache.configOutputFolder))
                 Directory.CreateDirectory(cache.configOutputFolder);
 
-            //读取模板文件
-            string getterTempletePath = Application.dataPath + "/ConfigManager/GetterTemplete";
-            string getterTemplete = File.ReadAllText(getterTempletePath);
-
             //源
             List<Source> sources = GetSources();
 
@@ -160,17 +161,8 @@ namespace ConfigManagerEditor
         {
             if (justRecompiled && waitingForSerialize)
             {
-                UnityEngine.Debug.Log("配置开始序列化！");
-
                 waitingForSerialize = false;
-
-                //无法缓存只能重新获取
-                List<Source> sources = GetSources();
-
-                //通过反射序列化
-                UnityEngine.Object set = (UnityEngine.Object)Serializer.Serialize(sources);
-                string o = cache.assetOutputFolder + "/" + assetName;
-                AssetDatabase.CreateAsset(set, o);
+                Serialize();
             }
             justRecompiled = false;
         }
@@ -231,6 +223,20 @@ namespace ConfigManagerEditor
                 sources.Add(source);
             }
             return sources;
+        }
+
+        /// <summary>
+        /// 序列化
+        /// </summary>
+        private void Serialize()
+        {
+            //无法缓存只能重新获取
+            List<Source> sources = GetSources();
+
+            //通过反射序列化
+            UnityEngine.Object set = (UnityEngine.Object)Serializer.Serialize(sources);
+            string o = cache.assetOutputFolder + "/" + assetName;
+            AssetDatabase.CreateAsset(set, o);
         }
     }
 

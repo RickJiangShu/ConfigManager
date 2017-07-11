@@ -207,7 +207,7 @@ namespace ConfigManagerEditor
             //获取所有配置文件
             DirectoryInfo directory = new DirectoryInfo(cache.sourceFolder);
 
-            FileInfo[] files = directory.GetFiles("*.txt|*.csv", SearchOption.AllDirectories);
+            FileInfo[] files = directory.GetFiles("*.*", SearchOption.AllDirectories);
 
             //可选选项
 
@@ -219,8 +219,12 @@ namespace ConfigManagerEditor
             List<Source> sources = new List<Source>();
             for (int i = 0, l = files.Length; i < l; i++)
             {
-                Source source = new Source();
                 FileInfo file = files[i];
+                if (file.Extension != ".txt" && file.Extension != ".csv")
+                    continue;
+
+
+                Source source = new Source();
 
                 string content;
                 DetectTextEncoding(file.FullName, out content);//转换不同的编码格式
@@ -235,7 +239,7 @@ namespace ConfigManagerEditor
                 if (content.IndexOf("\t") != -1)
                     sv = "\t";
                 else
-                    sv = ",(?=([^\"]*\"[^\"]*\")*(?![^\"]*\"))";//Fork:https://stackoverflow.com/questions/18144431/regex-to-split-a-csv
+                    sv = ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)";//Fork:https://stackoverflow.com/questions/6542996/how-to-split-csv-whose-columns-may-contain
 
                 //写入源
                 source.content = content;
@@ -253,6 +257,12 @@ namespace ConfigManagerEditor
         /// </summary>
         private void Serialize()
         {
+            //如果输出文件夹不存在，先创建
+            if (!Directory.Exists(cache.assetOutputFolder))
+            {
+                Directory.CreateDirectory(cache.assetOutputFolder);
+            }
+
             //无法缓存只能重新获取
             List<Source> sources = GetSources();
 

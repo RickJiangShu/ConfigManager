@@ -238,7 +238,7 @@ namespace ConfigManagerEditor
 
             //分割
             string[] lines = Regex.Split(config, lf);
-            string[] firstLine = Regex.Split(lines[0], sv);
+            string[] firstLine = Regex.Split(lines[0], sv, RegexOptions.Compiled);
             
             row = lines.Length;
             col = firstLine.Length;

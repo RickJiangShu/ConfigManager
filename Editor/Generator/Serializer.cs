@@ -55,9 +55,16 @@ namespace ConfigManagerEditor
                     string valueField = source.matrix[2,x];
                     string valueString = source.matrix[y,x];
                     FieldInfo field = configType.GetField(valueField);
-                    
-                    object value = ConfigTools.SourceValue2Object(valueType,valueString);
-                    field.SetValue(config,value);
+
+                    try
+                    {
+                        object value = ConfigTools.SourceValue2Object(valueType, valueString);
+                        field.SetValue(config, value);
+                    }
+                    catch
+                    {
+                        UnityEngine.Debug.LogError(string.Format("SourceValue2Object Error!valueType={0},valueString={1}",valueType,valueString));
+                    }
                 }
                 configs.SetValue(config, i);
             }

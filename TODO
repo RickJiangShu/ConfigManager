@@ -27,8 +27,14 @@ Config Manager 2开发计划
 * 清理Serializable内存
         Resources.UnloadUnusedAssets();			Resource OK
 
+* Clear Alert										OK
 
-* Clear Alert
+* 测试PlaceARPG 解析速度
+* 融入到PlaceARPG
+
+
+* 记录旧的解析速度
+* 记录旧的文件体积
 
 
 

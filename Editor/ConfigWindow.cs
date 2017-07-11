@@ -89,7 +89,13 @@ namespace ConfigManagerEditor
 
             if (GUILayout.Button("Clear Output"))
             {
-                ClearOutput();
+                if (EditorUtility.DisplayDialog("Clear Output",
+                "Are you sure you want to clear " + cache.configOutputFolder + " and " + cache.assetOutputFolder + "/" + assetName, 
+                "Yes", "No"))
+                {
+                    ClearOutput();
+                }
+
             }
 
             if (GUILayout.Button("Output"))
@@ -265,7 +271,7 @@ namespace ConfigManagerEditor
     {
         public string sourceFolder = "Assets/Config";
         public string configOutputFolder = "Assets/Scripts/Config";
-        public string assetOutputFolder = "Assets/Resources/";
+        public string assetOutputFolder = "Assets/Resources";
 
         public bool optional = false;//可选选项
         public int sourceTypeIndex;

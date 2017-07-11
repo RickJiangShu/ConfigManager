@@ -39,6 +39,7 @@ public class SerializableSet : UnityEngine.ScriptableObject
             }
 
             content = content.Replace("/*DeclareConfigs*/", declareConfigs);
+
             ConfigTools.WriteFile(outputPath, content);
         }
     }

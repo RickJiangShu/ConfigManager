@@ -20,15 +20,22 @@ Config Manager 2开发计划
 * 序列化测试										OK
 
 
+* Config.dict										OK
+* Config.Get										OK
+* 解析器											OK
+* 解析测试											OK
+* 清理Serializable内存
+        Resources.UnloadUnusedAssets();			Resource OK
 
-* 解析器
-* 选择Asset输出路径
 
-* 类型转换太乱了，要简化
+* Clear Alert
 
 
 
-* 将文件写入切割出来	ConfigParser 解析器
+CVS和逗号的问题 [1,2,3,4] "1,2,3,4"
+* 使用正则/手动选择									OK
+	自动判断 换行类型
+	自动判断 分隔符
 
 
 * 写文档

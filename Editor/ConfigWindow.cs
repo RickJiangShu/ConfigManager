@@ -66,11 +66,17 @@ namespace ConfigManagerEditor
             cache.configOutputFolder = EditorGUILayout.TextField("Config Output", cache.configOutputFolder);
             cache.assetOutputFolder = EditorGUILayout.TextField("Asset Output", cache.assetOutputFolder);
 
+            //Optional Settings
+            EditorGUILayout.Space();
+            cache.optional = EditorGUILayout.BeginToggleGroup("Optional Settings", cache.optional);
+
             //Config Type
             cache.sourceTypeIndex = EditorGUILayout.Popup("Source Type", cache.sourceTypeIndex, sourceTypeOptions);
 
             //LF
             cache.lineFeedIndex = EditorGUILayout.Popup("End of Line", cache.lineFeedIndex, lfOptions);
+
+            EditorGUILayout.EndToggleGroup();
 
             //Operation
             EditorGUILayout.Space();
@@ -142,13 +148,15 @@ namespace ConfigManagerEditor
             SerializableSetGenerator.Generate(sources, cache.configOutputFolder);
 
             //生产Deserializer
-
+            DeserializerGenerator.Generate(sources, cache.configOutputFolder);
 
             //刷新
             AssetDatabase.Refresh();
 
             //等待序列化
             waitingForSerialize = true;
+
+            Debug.Log("输出完成，正在等待Unity编译后序列化数据...");
         }
 
 
@@ -202,9 +210,19 @@ namespace ConfigManagerEditor
             DirectoryInfo directory = new DirectoryInfo(cache.sourceFolder);
             FileInfo[] files = directory.GetFiles("*.txt", SearchOption.AllDirectories);
 
-            //设置
-            string sv = separatedValues[cache.sourceTypeIndex];
-            string lf = lineFeed[cache.lineFeedIndex];
+            //可选选项
+            string sv;
+            string lf;
+            if (cache.optional)
+            {
+                sv = separatedValues[cache.sourceTypeIndex];
+                lf = lineFeed[cache.lineFeedIndex];
+            }
+            else
+            {
+                sv = @"\t|(?<![.*),(?!.*])";
+                lf = @"\r\n|\n|\r";
+            }
 
             //源
             List<Source> sources = new List<Source>();
@@ -237,6 +255,8 @@ namespace ConfigManagerEditor
             UnityEngine.Object set = (UnityEngine.Object)Serializer.Serialize(sources);
             string o = cache.assetOutputFolder + "/" + assetName;
             AssetDatabase.CreateAsset(set, o);
+
+            Debug.Log("序列化完成！");
         }
     }
 
@@ -247,6 +267,7 @@ namespace ConfigManagerEditor
         public string configOutputFolder = "Assets/Scripts/Config";
         public string assetOutputFolder = "Assets/Resources/";
 
+        public bool optional = false;//可选选项
         public int sourceTypeIndex;
         public int lineFeedIndex;
     }

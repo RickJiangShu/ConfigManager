@@ -273,13 +273,7 @@ namespace ConfigManagerEditor
             {
                 stream = File.Create(path);
             }
-            else
-            {
-                stream = File.OpenWrite(path);
-            }
-            StreamWriter writer = new StreamWriter(stream);
-            writer.Write(content);
-            writer.Close();
+            File.WriteAllText(path, content);
         }
     }
 }

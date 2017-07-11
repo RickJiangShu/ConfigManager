@@ -24,12 +24,11 @@ namespace ConfigManagerEditor
                 return null;
             }
 
-            object set = Activator.CreateInstance(t);
+            object set = UnityEngine.ScriptableObject.CreateInstance(t);
 
             foreach(Source source in sources)
             {
                 string fieldName = source.sourceName + "s";
-                int configCount = source.row - 3;
                 Array configs = Source2Configs(source);
                 FieldInfo fieldInfo = t.GetField(fieldName);
                 fieldInfo.SetValue(set,configs);
@@ -44,7 +43,6 @@ namespace ConfigManagerEditor
         private static Array Source2Configs(Source source)
         {
             Type configType = FindType(source.configName);
-            FieldInfo[] fields = configType.GetFields();
 
             int count = source.row - 3;
             Array configs = Array.CreateInstance(configType, count);

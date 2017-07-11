@@ -28,20 +28,16 @@ Config Manager 2开发计划
         Resources.UnloadUnusedAssets();			Resource OK
 
 * Clear Alert										OK
+* 输入文件格式乱码									OK
 
-* 测试PlaceARPG 解析速度
-* 融入到PlaceARPG
-
-
-* 记录旧的解析速度
-* 记录旧的文件体积
-
-
-
+CSV 
 CVS和逗号的问题 [1,2,3,4] "1,2,3,4"
 * 使用正则/手动选择									OK
 	自动判断 换行类型
 	自动判断 分隔符
+
+
+提示：如果是CVS格式的文件，使用string和数组类型时请用[]括起来（因为要区别,号），如：[Hello, I'm OK!]、[4,5,6]。
 
 
 * 写文档
@@ -151,3 +147,6 @@ Q&A
 
 * 为什么要动态解析 Serializer、SerializableList、Deseriazlier？
 * 因为如果不动态解析，就要使用反射去反序列化Config，那样太慢了。
+
+* 与上一代性能比较
+* 运行时解析速度提高了8倍（数据量越大越高），文件大小一样。 

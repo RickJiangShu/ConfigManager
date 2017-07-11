@@ -213,7 +213,6 @@ namespace ConfigManagerEditor
             if (string.IsNullOrEmpty(sourceValue) || sourceValue == "0") return null;
 
             string[] values = sourceValue.Split(',');
-
             Type type = SourceType2Type(baseType);
             Array array = Array.CreateInstance(type,values.Length);
             for(int i = 0,l = array.Length;i<l;i++)
@@ -237,8 +236,10 @@ namespace ConfigManagerEditor
         {
             config = config.Trim();//清空末尾的空白
 
+            //分割
             string[] lines = Regex.Split(config, lf);
             string[] firstLine = Regex.Split(lines[0], sv);
+            
             row = lines.Length;
             col = firstLine.Length;
             string[,] matrix = new string[row, col];
@@ -273,7 +274,14 @@ namespace ConfigManagerEditor
             {
                 stream = File.Create(path);
             }
-            File.WriteAllText(path, content);
+            else
+            {
+                stream = File.Open(path, FileMode.Truncate);
+            }
+
+            StreamWriter writer = new StreamWriter(stream, System.Text.Encoding.UTF8);
+            writer.Write(content);
+            writer.Close();
         }
     }
 }

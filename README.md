@@ -35,9 +35,9 @@ Deserializer.Deserialize(set);
 
 # 表格格式
 以列为属性，以行为一项；<br>
-第1行为__注释__；<br>
-第2行为__数据类型__<br>
-第3行为__字段标识符__<br>
+第1行为**注释**；<br>
+第2行为**数据类型**<br>
+第3行为**字段标识符**<br>
 第4行及以下为各项配置<br>
 ![](https://raw.githubusercontent.com/RickJiangShu/ConfigManager-Example/master/Poster/p5.jpg "")<br>
 <br>

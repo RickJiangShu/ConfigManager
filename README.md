@@ -11,13 +11,7 @@
 ### 运行时：
 1. 调用反序列化接口；<br>
 2. 使用配置文件。<br>
-```
-SerializableSet set = Resources.Load<SerializableSet>("SerializableSet");
-Deserializer.Deserialize(set);
-        
-MonsterConfig monsterCfg = MonsterConfig.Get(210102)
-print(monsterCfg.name);
-```
+
 <br>
 # 特点
 ### 高性能

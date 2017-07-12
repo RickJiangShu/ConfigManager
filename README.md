@@ -19,7 +19,8 @@ Deserializer.Deserialize(set);
 MonsterConfig monsterCfg = MonsterConfig.Get(210102)
 print(monsterCfg.name);
 ```
-
+### 范例
+https://github.com/RickJiangShu/ConfigManager-Example
 # 特点
 ### 高性能
 大量数据的解析工作完全放在编辑器下完成。<br>

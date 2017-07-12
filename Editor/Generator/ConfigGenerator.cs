@@ -23,11 +23,49 @@ namespace ConfigManagerEditor
 public class /*ClassName*/
 {
 /*DeclareProperties*/
-    public static Dictionary</*IDType*/, /*ClassName*/> dict = new Dictionary</*IDType*/, /*ClassName*/>();
+    private static Dictionary</*IDType*/, /*ClassName*/> dictionary = new Dictionary</*IDType*/, /*ClassName*/>();
 
+    /// <summary>
+    /// 通过/*IDField*/获取/*ClassName*/的实例
+    /// </summary>
+    /// <param name=""/*IDField*/"">索引</param>
+    /// <returns>/*ClassName*/的实例</returns>
     public static /*ClassName*/ Get(/*IDType*/ /*IDField*/)
     {
-        return dict[/*IDField*/];
+        return dictionary[/*IDField*/];
+    }
+    
+    /// <summary>
+    /// 获取字典
+    /// </summary>
+    /// <returns>字典</returns>
+    public static Dictionary</*IDType*/, /*ClassName*/> GetDictionary()
+    {
+        return dictionary;
+    }
+
+    /// <summary>
+    /// 获取所有键
+    /// </summary>
+    /// <returns>所有键</returns>
+    public static /*IDType*/[] GetKeys()
+    {
+        int count = dictionary.Keys.Count;
+        /*IDType*/[] keys = new /*IDType*/[count];
+        dictionary.Keys.CopyTo(keys,0);
+        return keys;
+    }
+
+    /// <summary>
+    /// 获取所有实例
+    /// </summary>
+    /// <returns>所有实例</returns>
+    public static /*ClassName*/[] GetValues()
+    {
+        int count = dictionary.Values.Count;
+        /*ClassName*/[] values = new /*ClassName*/[count];
+        dictionary.Values.CopyTo(values, 0);
+        return values;
     }
 }
 ";

@@ -43,10 +43,23 @@ CSV													OK
 * 都转换为CSV										OK
 * AssetBundle 及清理内存建议						OK
 * 整理 Example 项目									OK
+
+
+
+* 支持Keys																OK
+* 支持Get(),GetDictionary(),GetKeys(),GetValues() 并优化注释			OK
 * 上传				
 
 
 * 写文档
+	用途
+	特点
+	快速使用
+	优化建议
+	示例
+	贡献名单
+		
+
 * 写宣传
 
 

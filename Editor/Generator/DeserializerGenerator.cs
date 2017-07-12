@@ -26,9 +26,10 @@ namespace ConfigManagerEditor
 }
 ";
         private const string templete2 =
-@"        for (int i = 0, l = set./*SourceName*/s.Length; i < l; i++)
+@"       
+        for (int i = 0, l = set./*SourceName*/s.Length; i < l; i++)
         {
-            /*ConfigName*/.dict.Add(set./*SourceName*/s[i]./*IDField*/, set./*SourceName*/s[i]);
+            /*ConfigName*/.GetDictionary().Add(set./*SourceName*/s[i]./*IDField*/, set./*SourceName*/s[i]);
         }
 ";
 

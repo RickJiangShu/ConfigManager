@@ -19,6 +19,7 @@ Deserializer.Deserialize(set);
 MonsterConfig monsterCfg = MonsterConfig.Get(210102)
 print(monsterCfg.name);
 ```
+
 # 特点
 ### 高性能
 大量数据的解析工作完全放在编辑器下完成。<br>
@@ -45,6 +46,7 @@ Deserializer.Deserialize(set);
 目前支持的格式有：*.txt *.cvs<br>
 ### 直接配置数据类型
 支持所有C#值类型和数组类型，合理运用有助于减少内存占用。<br>
+
 # 表格格式
 以列为属性，以行为一项；<br>
 第1行为**注释**；<br>
@@ -53,6 +55,7 @@ Deserializer.Deserialize(set);
 第4行及以下为各项配置<br>
 ![](https://raw.githubusercontent.com/RickJiangShu/ConfigManager-Example/master/Poster/p3.jpg "")<br>
 <br>
+
 # 支持的数据类型
 | 配置类型 | 对应C#类型  | 取值范围 |
 | :------------: |:---------------:| :-----:|

@@ -1,5 +1,25 @@
 # ConfigManager：一键使用Excel等表格配置
 ![logo](https://raw.githubusercontent.com/RickJiangShu/ConfigManager-Example/master/Poster/Logo.jpg "logo")
+
+# 快速使用
+编辑器：<br>
+*0、将代码下载到Assets目录下；*<br>
+1、点击菜单栏"Window/Config Manager"；<br>
+2、设置对应的输入/输出路径；<br>
+3、点击Output。<br>
+![](https://raw.githubusercontent.com/RickJiangShu/ConfigManager-Example/master/Poster/p4.jpg "")
+<br>
+运行时：<br>
+1、调用反序列化接口；<br>
+2、使用配置文件。<br>
+```
+SerializableSet set = Resources.Load<SerializableSet>("SerializableSet");
+Deserializer.Deserialize(set);
+        
+MonsterConfig monsterCfg = MonsterConfig.Get(210102)
+print(monsterCfg.name);
+```
+
 # 特点
 ### 高性能
 大量数据的解析工作完全放在编辑器下完成。<br>
@@ -27,7 +47,7 @@ Deserializer.Deserialize(set);
 目前支持的格式有：*.txt *.cvs<br>
 <br>
 ### 直接配置数据类型
-支持所有C#数据类型，合理运用有助于减少内存占用。<br>
+支持所有C#值类型和数组类型，合理运用有助于减少内存占用。<br>
 <br>
 # 表格格式
 以列为属性，以行为一项；<br>
@@ -35,7 +55,7 @@ Deserializer.Deserialize(set);
 第2行为**数据类型**<br>
 第3行为**字段标识符**<br>
 第4行及以下为各项配置<br>
-![](https://raw.githubusercontent.com/RickJiangShu/ConfigManager-Example/master/Poster/p5.jpg "")<br>
+![](https://raw.githubusercontent.com/RickJiangShu/ConfigManager-Example/master/Poster/p3.jpg "")<br>
 <br>
 # 支持的数据类型
 | 配置类型 | 对应C#类型  | 取值范围 |
@@ -53,19 +73,9 @@ Deserializer.Deserialize(set);
 |double|double|±5.0 × 10^−324 ~ ±1.7 × 10^308|
 |string|string|Any|
 <br>
-并支持以上基础类型的所有__数组类型__。<br>
+并支持以上基础类型的所有**数组类型**。<br>
 例如：字符串数组类型是string[]，值是Hello,World<br>
 <br>
-
-## 简介
-ConfigManager使开发人员一键导入并使用配置文件。<br>
-Github：https://github.com/RickJiangShu/ConfigManager<br>
-
-## 特点
-1、将*.txt文件一键解析成*.cs文件（称之getter），方便直观；<br>
-2、支持所有C#基础类型且支持数组格式；
-
-
 
 
 
@@ -73,19 +83,6 @@ Github：https://github.com/RickJiangShu/ConfigManager<br>
 与资源加载解耦，等您的资源加载完成后，只需调用一个方法反序列化即可。
 
 
-## 使用流程
-1、策划从文档导出约定格式的txt文件；<br>
-2、将txt放入到工程Resources/下面；<br>
-3、点击菜单ConfigManager/Output；<br>
-4、在代码中调用一次ConfigLoader.Load()；<br>
-5、在使用 XXConfig.Get(id) 即可。<br>
-
-## 配置文件格式
-1、文件类型*.txt；<br>
-2、编码选择UTF-8；<br>
-3、第1行注释，第2行类型，第3行标识符；<br>
-4、配置以“行”为单位，即每行为一个数据。第一列用于索引数据；<br>
-5、字符串不要加上双引号""；<br>
 
 
 * 做一张宣传图

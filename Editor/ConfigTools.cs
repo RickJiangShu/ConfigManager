@@ -194,6 +194,12 @@ namespace ConfigManagerEditor
                 case "double":
                     return double.Parse(sourceValue);
                 case "string":
+                    //去除CSV的""
+                    if (!string.IsNullOrEmpty(sourceValue) && sourceValue[0] == '"')
+                    {
+                        sourceValue = sourceValue.Remove(0, 1);
+                        sourceValue = sourceValue.Remove(sourceValue.Length - 1, 1);
+                    }
                     return sourceValue;
                 default:
                     return sourceValue;
@@ -211,6 +217,16 @@ namespace ConfigManagerEditor
         {
             //解析数组
             if (string.IsNullOrEmpty(sourceValue) || sourceValue == "0") return null;
+
+            //去除CSV的""
+            if (sourceValue[0] == '"')
+            {
+                if (sourceValue.Length <= 2)
+                    return null;
+
+                sourceValue = sourceValue.Remove(0, 1);
+                sourceValue = sourceValue.Remove(sourceValue.Length - 1, 1);
+            }
 
             string[] values = sourceValue.Split(',');
             Type type = SourceType2Type(baseType);

@@ -2,7 +2,7 @@
 一键使用Excel等表格配置<br>
 ![logo](https://raw.githubusercontent.com/RickJiangShu/ConfigManager-Example/master/Poster/Logo.jpg "logo")
 # 特点
-### *高性能*
+### 高性能
 大量数据的解析工作完全放在编辑器下完成。<br>
 ![](https://raw.githubusercontent.com/RickJiangShu/ConfigManager-Example/master/Poster/p1.jpg "")
 <br>

@@ -1,5 +1,48 @@
+
+
 # ConfigManager
-注意master正在合并中。。。上次的发行版本请使用v1
+一键使用Excel等表格配置<br>
+![logo](https://raw.githubusercontent.com/RickJiangShu/ConfigManager-Example/master/Poster/Logo.jpg "logo")  
+
+# 特点
+
+### __高性能__
+大量数据的解析工作完全放在编辑器下完成。<br>
+![](https://raw.githubusercontent.com/RickJiangShu/ConfigManager-Example/master/Poster/p1.jpg "")  
+
+### 易用
+提供了操作简单的编辑窗口，轻松点击鼠标操作。<br>
+![](https://raw.githubusercontent.com/RickJiangShu/ConfigManager-Example/master/Poster/p2.jpg "")  
+
+### 解耦
+不关心您项目的资源管理策略，只需在加载配置文件后调用Deserializer即可。<br>
+```
+//Resource加载
+SerializableSet set = Resources.Load<SerializableSet>("SerializableSet");
+Deserializer.Deserialize(set);
+
+//AssetBundle加载
+AssetBundle bundle = AssetBundle.LoadFromFile(Application.streamingAssetsPath + "/config.ab");
+SerializableSet set = bundle.LoadAsset<SerializableSet>("SerializableSet");
+Deserializer.Deserialize(set);
+```
+
+### 支持多种格式
+目前支持的格式有：*.txt *.cvs<br>
+
+### 支持直接配置数据类型和注释
+
+
+
+
+
+### 表格格式
+
+### 支持的数据类型
+| 配置类型 | 对应C#类型  | 取值范围 |
+| :------------: |:---------------:| :-----:|
+|bool|bool|0、false、False、False 都为否，其他为是|
+
 
 ## 简介
 ConfigManager使开发人员一键导入并使用配置文件。<br>
@@ -10,13 +53,7 @@ Github：https://github.com/RickJiangShu/ConfigManager<br>
 2、支持所有C#基础类型且支持数组格式；
 
 
-* 高效
-配置解析全部放在编辑器下，并序列化为Asset；运行时仅需反序列化出来即可。
 
-* 体积小
-抛弃原始的文本配置文件，数据仅为序列化数组。
-
-* 易用
 
 
 * 解耦
@@ -37,4 +74,14 @@ Github：https://github.com/RickJiangShu/ConfigManager<br>
 4、配置以“行”为单位，即每行为一个数据。第一列用于索引数据；<br>
 5、字符串不要加上双引号""；<br>
 
+
+* 做一张宣传图
+
+* 写插件手册
+	用途
+	特点
+	快速使用
+	优化建议
+	示例
+	贡献名单
 

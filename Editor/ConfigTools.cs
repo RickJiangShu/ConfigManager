@@ -24,48 +24,50 @@ namespace ConfigManagerEditor
         /// 判断是否是数组类型
         /// </summary>
         /// <returns></returns>
-        public static bool IsArrayType(string sourceType,out string sourceBType)
+        public static bool IsArrayType(string sourceType,out string sourceBaseType)
         {
             int idx = sourceType.LastIndexOf('[');
             if (idx != -1)
-                sourceBType = SourceBType2BaseBType(sourceType.Substring(0, idx));
+                sourceBaseType = SourceBaseType2CSharpBaseType(sourceType.Substring(0, idx));
             else
-                sourceBType = sourceType;
+                sourceBaseType = sourceType;
             return idx != -1;
         }
 
-        #region 将SourceType转换为ConfigType
+        #region 将SourceType转换为CSharp
         /// <summary>
         /// 将类型字符串转换为C#基础类型
         /// </summary>
         /// <param name="str"></param>
         /// <returns></returns>
-        public static string SourceType2ConfigType(string sourceType)
+        public static string SourceType2CSharpType(string sourceType)
         {
             string sourceBType;
             if (IsArrayType(sourceType, out sourceBType))
             {
                 return sourceBType + "[]";
             }
-            return SourceBType2BaseBType(sourceType);
+            return SourceBaseType2CSharpBaseType(sourceType);
         }
 
         /// <summary>
-        /// 将SourceType转换为C#基础类型
+        /// 将SourceBaseType转换为C#基础类型
         /// </summary>
-        /// <param name="sourceBType"></param>
+        /// <param name="sourceBaseType"></param>
         /// <returns></returns>
-        private static string SourceBType2BaseBType(string sourceBType)
+        private static string SourceBaseType2CSharpBaseType(string sourceBaseType)
         {
             string baseType;
-            switch (sourceBType)
+            switch (sourceBaseType)
             {
                 case "bool":
                     baseType = "bool";
                     break;
+                case "byte":
                 case "uint8":
                     baseType = "byte";
                     break;
+                case "ushort":
                 case "uint16":
                     baseType = "ushort";
                     break;
@@ -73,21 +75,25 @@ namespace ConfigManagerEditor
                 case "uint32":
                     baseType = "uint";
                     break;
+                case "ulong":
+                case "uint64":
+                    baseType = "ulong";
+                    break;
+                case "sbyte":
                 case "int8":
                     baseType = "sbyte";
                     break;
+                case "short":
                 case "int16":
                     baseType = "short";
                     break;
-                case "int32":
                 case "int":
+                case "int32":
                     baseType = "int";
                     break;
                 case "long":
+                case "int64":
                     baseType = "long";
-                    break;
-                case "ulong":
-                    baseType = "ulong";
                     break;
                 case "float":
                     baseType = "float";
@@ -99,32 +105,31 @@ namespace ConfigManagerEditor
                     baseType = "string";
                     break;
                 default:
-                    baseType = sourceBType;
+                    baseType = sourceBaseType;
                     break;
             }
             return baseType;
         }
         #endregion
 
-        #region 将SourceType转换为ObjectType
-        private static Type SourceType2Type(string sourceType)
+        #region 将SourceType转换为SystemType
+        private static Type SourceBaseType2Type(string sourceBaseType)
         {
-            switch (sourceType)
+            string csharpBaseType = SourceBaseType2CSharpBaseType(sourceBaseType);
+            switch (csharpBaseType)
             {
                 case "bool":
                     return typeof(bool);
-                case "uint8":
+                case "byte":
                     return typeof(byte);
-                case "uint16":
+                case "ushort":
                     return typeof(ushort);
                 case "uint":
-                case "uint32":
                     return typeof(uint);
-                case "int8":
+                case "sbyte":
                     return typeof(sbyte);
-                case "int16":
+                case "short":
                     return typeof(short);
-                case "int32":
                 case "int":
                     return typeof(int);
                 case "long":
@@ -152,37 +157,35 @@ namespace ConfigManagerEditor
         /// <returns></returns>
         public static object SourceValue2Object(string sourceType, string sourceValue)
         {
-            string baseType;
-            if (IsArrayType(sourceType,out baseType))
+            string sourceBaseType;
+            if (IsArrayType(sourceType,out sourceBaseType))
             {
-                return SourceValue2ArrayValue(sourceType, sourceValue, baseType);
+                return SourceValue2ArrayObject(sourceType, sourceValue, sourceBaseType);
             }
             else
             {
                 //返回独值
-                return SourceValue2BaseValue(sourceType, sourceValue);
+                return SourceValue2BaseObject(sourceType, sourceValue);
             }
         }
 
-        private static object SourceValue2BaseValue(string sourceType,string sourceValue)
+        private static object SourceValue2BaseObject(string sourceBaseType,string sourceValue)
         {
-            switch (sourceType)
+            string csharpType = SourceBaseType2CSharpBaseType(sourceBaseType);
+            switch (csharpType)
             {
                 case "bool":
                     return sourceValue != "0" && sourceValue != "false" && sourceValue != "False" && sourceValue != "FALSE";
-                   // return bool.Parse(sourceValue);
-                case "uint8":
+                case "byte":
                     return byte.Parse(sourceValue);
-                case "uint16":
+                case "ushort":
                     return ushort.Parse(sourceValue);
                 case "uint":
-                case "uint32":
                     return uint.Parse(sourceValue);
-                case "int8":
+                case "sbyte":
                     return sbyte.Parse(sourceValue);
-                case "int16":
+                case "short":
                     return short.Parse(sourceValue);
-                case "int32":
                 case "int":
                     return int.Parse(sourceValue);
                 case "long":
@@ -213,7 +216,7 @@ namespace ConfigManagerEditor
         /// <param name="cValue"></param>
         /// <param name="converter"></param>
         /// <returns></returns>
-        public static Array SourceValue2ArrayValue(string sourceType,string sourceValue,string baseType)
+        public static Array SourceValue2ArrayObject(string sourceType,string sourceValue,string sourceBaseType)
         {
             //解析数组
             if (string.IsNullOrEmpty(sourceValue) || sourceValue == "0") return null;
@@ -229,11 +232,11 @@ namespace ConfigManagerEditor
             }
 
             string[] values = sourceValue.Split(',');
-            Type type = SourceType2Type(baseType);
+            Type type = SourceBaseType2Type(sourceBaseType);
             Array array = Array.CreateInstance(type,values.Length);
             for(int i = 0,l = array.Length;i<l;i++)
             {
-                object value = SourceValue2BaseValue(baseType, values[i]);
+                object value = SourceValue2BaseObject(sourceBaseType, values[i]);
                 array.SetValue(value,i);
             }
             return array;

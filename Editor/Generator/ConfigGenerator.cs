@@ -87,7 +87,7 @@ public class /*ClassName*/
                 string content = templete;
                 string outputPath = outputFolder + "/" + src.configName + ".cs";
 
-                string idType = ConfigTools.SourceType2ConfigType(src.matrix[1, 0]);
+                string idType = ConfigTools.SourceType2CSharpType(src.matrix[1, 0]);
                 string idField = src.matrix[2, 0];
 
                 //属性声明
@@ -95,7 +95,7 @@ public class /*ClassName*/
                 for (int x = 0; x < src.column; x++)
                 {
                     string comment = src.matrix[0, x];
-                    string csType = ConfigTools.SourceType2ConfigType(src.matrix[1, x]);
+                    string csType = ConfigTools.SourceType2CSharpType(src.matrix[1, x]);
                     string field = src.matrix[2, x];
                     string declare = string.Format(templete2, comment, csType, field);
                     declareProperties += declare;

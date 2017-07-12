@@ -48,19 +48,15 @@ CSV													OK
 
 * 支持Keys																OK
 * 支持Get(),GetDictionary(),GetKeys(),GetValues() 并优化注释			OK
-* 上传				
+* 上传																	OK
 
 
-* 写文档
-	用途
-	特点
-	快速使用
-	优化建议
-	示例
-	贡献名单
+
 		
+* 写技术文档
+	
 
-* 写宣传
+* 写宣传帖子
 
 
 

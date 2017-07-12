@@ -1,19 +1,15 @@
-
-
 # ConfigManager
 一键使用Excel等表格配置<br>
-![logo](https://raw.githubusercontent.com/RickJiangShu/ConfigManager-Example/master/Poster/Logo.jpg "logo")  
-
+![logo](https://raw.githubusercontent.com/RickJiangShu/ConfigManager-Example/master/Poster/Logo.jpg "logo")
 # 特点
-
-### __高性能__
+### *高性能*
 大量数据的解析工作完全放在编辑器下完成。<br>
-![](https://raw.githubusercontent.com/RickJiangShu/ConfigManager-Example/master/Poster/p1.jpg "")  
-
+![](https://raw.githubusercontent.com/RickJiangShu/ConfigManager-Example/master/Poster/p1.jpg "")
+<br>
 ### 易用
 提供了操作简单的编辑窗口，轻松点击鼠标操作。<br>
 ![](https://raw.githubusercontent.com/RickJiangShu/ConfigManager-Example/master/Poster/p2.jpg "")  
-
+<br>
 ### 解耦
 不关心您项目的资源管理策略，只需在加载配置文件后调用Deserializer即可。<br>
 ```
@@ -26,13 +22,13 @@ AssetBundle bundle = AssetBundle.LoadFromFile(Application.streamingAssetsPath + 
 SerializableSet set = bundle.LoadAsset<SerializableSet>("SerializableSet");
 Deserializer.Deserialize(set);
 ```
-
+<br>
 ### 支持多种格式
 目前支持的格式有：*.txt *.cvs<br>
-
+<br>
 ### 直接配置数据类型
 支持所有C#数据类型，合理运用有助于减少内存占用。
-
+<br>
 # 表格格式
 以列为属性，以行为一项；<br>
 第1行为**注释**；<br>
@@ -58,8 +54,8 @@ Deserializer.Deserialize(set);
 |string|string|Any|
 <br>
 并支持以上基础类型的所有__数组类型__。<br>
-例如：字符串数组类型是string[]，值是Hello,World
-
+例如：字符串数组类型是string[]，值是Hello,World<br>
+<br>
 
 ## 简介
 ConfigManager使开发人员一键导入并使用配置文件。<br>

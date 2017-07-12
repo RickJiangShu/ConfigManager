@@ -42,7 +42,6 @@ AssetBundle bundle = AssetBundle.LoadFromFile(Application.streamingAssetsPath + 
 SerializableSet set = bundle.LoadAsset<SerializableSet>("SerializableSet");
 Deserializer.Deserialize(set);
 ```
-<br>
 ### 支持多种格式
 目前支持的格式有：*.txt *.cvs<br>
 ### 直接配置数据类型

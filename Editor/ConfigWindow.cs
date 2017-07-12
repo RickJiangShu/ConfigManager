@@ -28,10 +28,10 @@ namespace ConfigManagerEditor
             justRecompiled = true;
         }
 
-        [MenuItem("Window/ConfigManager")]
+        [MenuItem("Window/Config Manager")]
         public static ConfigWindow Get()
         {
-            return EditorWindow.GetWindow<ConfigWindow>("ConfigManager");
+            return EditorWindow.GetWindow<ConfigWindow>("Config Manager");
         }
 
         //

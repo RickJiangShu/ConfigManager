@@ -283,7 +283,11 @@ namespace ConfigManagerEditor
         // the string with the discovered encoding applied to the file.
         public Encoding DetectTextEncoding(string filename, out String text, int taster = 1000)
         {
-            byte[] b = File.ReadAllBytes(filename);
+            byte[] b;
+            ConfigTools.ReadFile(filename, out b);
+
+
+           // byte[] b = File.ReadAllBytes(filename);
 
             //////////////// First check the low hanging fruit by checking if a
             //////////////// BOM/signature exists (sourced from http://www.unicode.org/faq/utf_bom.html#bom4)

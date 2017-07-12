@@ -302,5 +302,28 @@ namespace ConfigManagerEditor
             writer.Write(content);
             writer.Close();
         }
+
+        /// <summary>
+        /// 读取文件内容 
+        /// Fork:
+        /// https://stackoverflow.com/questions/1389155/easiest-way-to-read-text-file-which-is-locked-by-another-application
+        /// https://stackoverflow.com/questions/221925/creating-a-byte-array-from-a-stream
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static string ReadFile(string path,out byte[] bytes)
+        {
+            using (var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            {
+                using (BinaryReader br = new BinaryReader(fileStream))
+                {
+                    bytes = br.ReadBytes((int)fileStream.Length);
+                }
+                using (var textReader = new StreamReader(fileStream))
+                {
+                    return textReader.ReadToEnd();
+                }
+            }
+        }
     }
 }

@@ -1,19 +1,34 @@
+# ConfigManager：一键使用Excel等表格配置
+![logo](https://raw.githubusercontent.com/RickJiangShu/ConfigManager-Example/master/Poster/Logo.jpg "logo")
 
+# 快速使用
+### 编辑器：
+1. 点击菜单栏"Window/Config Manager"；
+2. 设置对应的输入/输出路径；
+3. 点击Output。
 
-# ConfigManager
-一键使用Excel等表格配置<br>
-![logo](https://raw.githubusercontent.com/RickJiangShu/ConfigManager-Example/master/Poster/Logo.jpg "logo")  
+![](https://raw.githubusercontent.com/RickJiangShu/ConfigManager-Example/master/Poster/p4.jpg "")
+<br>
+### 运行时：
+1. 调用反序列化接口；
+2. 使用配置文件。
+```
+SerializableSet set = Resources.Load<SerializableSet>("SerializableSet");
+Deserializer.Deserialize(set);
+        
+MonsterConfig monsterCfg = MonsterConfig.Get(210102)
+print(monsterCfg.name);
+```
 
 # 特点
-
-### __高性能__
+### 高性能
 大量数据的解析工作完全放在编辑器下完成。<br>
-![](https://raw.githubusercontent.com/RickJiangShu/ConfigManager-Example/master/Poster/p1.jpg "")  
-
+![](https://raw.githubusercontent.com/RickJiangShu/ConfigManager-Example/master/Poster/p1.jpg "")
+<br>
 ### 易用
 提供了操作简单的编辑窗口，轻松点击鼠标操作。<br>
 ![](https://raw.githubusercontent.com/RickJiangShu/ConfigManager-Example/master/Poster/p2.jpg "")  
-
+<br>
 ### 解耦
 不关心您项目的资源管理策略，只需在加载配置文件后调用Deserializer即可。<br>
 ```
@@ -26,20 +41,20 @@ AssetBundle bundle = AssetBundle.LoadFromFile(Application.streamingAssetsPath + 
 SerializableSet set = bundle.LoadAsset<SerializableSet>("SerializableSet");
 Deserializer.Deserialize(set);
 ```
-
+<br>
 ### 支持多种格式
 目前支持的格式有：*.txt *.cvs<br>
-
 ### 直接配置数据类型
-支持所有C#数据类型，合理运用有助于减少内存占用。
+支持所有C#值类型和数组类型，合理运用有助于减少内存占用。<br>
 
 # 表格格式
-以列为属性，以行为一项；
-第1行为__注释__
-第2行为__数据类型__
-第3行为__字段标识符__
-第4行及以下为各项配置
-![](https://raw.githubusercontent.com/RickJiangShu/ConfigManager-Example/master/Poster/p5.jpg "")  
+以列为属性，以行为一项；<br>
+第1行为**注释**；<br>
+第2行为**数据类型**<br>
+第3行为**字段标识符**<br>
+第4行及以下为各项配置<br>
+![](https://raw.githubusercontent.com/RickJiangShu/ConfigManager-Example/master/Poster/p3.jpg "")<br>
+<br>
 
 # 支持的数据类型
 | 配置类型 | 对应C#类型  | 取值范围 |
@@ -56,49 +71,20 @@ Deserializer.Deserialize(set);
 |float|float|-3.4 × 10^38 ~ +3.4 × 10^38|
 |double|double|±5.0 × 10^−324 ~ ±1.7 × 10^308|
 |string|string|Any|
-<br>
-并支持以上基础类型的所有__数组类型__。<br>
-例如：字符串数组类型是string[]，值是Hello,World
 
+并支持以上基础类型的所有**数组类型**。<br>
+例如：字符串数组类型是string[]，值是Hello,World<br>
 
-## 简介
-ConfigManager使开发人员一键导入并使用配置文件。<br>
-Github：https://github.com/RickJiangShu/ConfigManager<br>
+# 优化建议
+1. 在Deserialize之后，把加载的序列化数据卸载掉。
+```
+Resources.UnloadUnusedAssets();//Resources卸载内存
 
-## 特点
-1、将*.txt文件一键解析成*.cs文件（称之getter），方便直观；<br>
-2、支持所有C#基础类型且支持数组格式；
+bundle.Unload(true);//AssetBundle卸载内存
+```
+2. 注意GetKeys()、GetValues()是Copy一个数组出来，所以做好缓存的工作。
 
-
-
-
-
-* 解耦
-与资源加载解耦，等您的资源加载完成后，只需调用一个方法反序列化即可。
-
-
-## 使用流程
-1、策划从文档导出约定格式的txt文件；<br>
-2、将txt放入到工程Resources/下面；<br>
-3、点击菜单ConfigManager/Output；<br>
-4、在代码中调用一次ConfigLoader.Load()；<br>
-5、在使用 XXConfig.Get(id) 即可。<br>
-
-## 配置文件格式
-1、文件类型*.txt；<br>
-2、编码选择UTF-8；<br>
-3、第1行注释，第2行类型，第3行标识符；<br>
-4、配置以“行”为单位，即每行为一个数据。第一列用于索引数据；<br>
-5、字符串不要加上双引号""；<br>
-
-
-* 做一张宣传图
-
-* 写插件手册
-	用途
-	特点
-	快速使用
-	优化建议
-	示例
-	贡献名单
-
+# 贡献者名单
+如果你有任何Bug、问题和意见请在Issues里提出来，有时间一定立马回复，意见一经采纳就被列入“贡献者名单”。
+1. LiGo 提供希望支持cvs的建议
+2. k1104480005 提供希望支持Get所有数据的方法

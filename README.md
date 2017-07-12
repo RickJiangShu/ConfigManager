@@ -41,13 +41,10 @@ SerializableSet set = bundle.LoadAsset<SerializableSet>("SerializableSet");
 Deserializer.Deserialize(set);
 ```
 <br>
-
 ### 支持多种格式
 目前支持的格式有：*.txt *.cvs<br>
-<br>
 ### 直接配置数据类型
 支持所有C#值类型和数组类型，合理运用有助于减少内存占用。<br>
-<br>
 # 表格格式
 以列为属性，以行为一项；<br>
 第1行为**注释**；<br>

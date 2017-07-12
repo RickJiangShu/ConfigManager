@@ -71,8 +71,8 @@ Deserializer.Deserialize(set);
 |float|float|-3.4 × 10^38 ~ +3.4 × 10^38|
 |double|double|±5.0 × 10^−324 ~ ±1.7 × 10^308|
 |string|string|Any|
-<br>
-并支持以上基础类型的所有***数组类型***。<br>
+
+并支持以上基础类型的所有**数组类型**。<br>
 例如：字符串数组类型是string[]，值是Hello,World<br>
 
 # 优化建议

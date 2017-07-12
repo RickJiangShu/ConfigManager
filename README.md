@@ -75,22 +75,16 @@ Deserializer.Deserialize(set);
 并支持以上基础类型的所有**数组类型**。<br>
 例如：字符串数组类型是string[]，值是Hello,World<br>
 <br>
+# 优化建议
+1. 在Deserialize之后，把加载的序列化数据卸载掉。
+```
+Resources.UnloadUnusedAssets();//Resources卸载内存
 
+bundle.Unload(true);//AssetBundle卸载内存
+```
+2. 注意GetKeys()、GetValues()是Copy一个数组出来，所以做好缓存的工作。
 
-
-* 解耦
-与资源加载解耦，等您的资源加载完成后，只需调用一个方法反序列化即可。
-
-
-
-
-* 做一张宣传图
-
-* 写插件手册
-	用途
-	特点
-	快速使用
-	优化建议
-	示例
-	贡献名单
-
+# 贡献者名单
+如果你有任何Bug、问题和意见请在Issues里提出来，有时间一定立马回复，意见一经采纳就被列入“贡献者名单”。
+1. LiGo 提供希望支持cvs的建议
+2. k1104480005 提供希望支持Get所有数据的方法

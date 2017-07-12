@@ -3,14 +3,15 @@
 
 # 快速使用
 ### 编辑器：
-1. 点击菜单栏"Window/Config Manager"；<br>
-2. 设置对应的输入/输出路径；<br>
-3. 点击Output。<br>
+1. 点击菜单栏"Window/Config Manager"；
+2. 设置对应的输入/输出路径；
+3. 点击Output。
+
 ![](https://raw.githubusercontent.com/RickJiangShu/ConfigManager-Example/master/Poster/p4.jpg "")
 <br>
 ### 运行时：
-1. 调用反序列化接口；<br>
-2. 使用配置文件。<br>
+1. 调用反序列化接口；
+2. 使用配置文件。
 ```
 SerializableSet set = Resources.Load<SerializableSet>("SerializableSet");
 Deserializer.Deserialize(set);

@@ -18,7 +18,6 @@ Deserializer.Deserialize(set);
 MonsterConfig monsterCfg = MonsterConfig.Get(210102)
 print(monsterCfg.name);
 ```
-
 <br>
 # 特点
 ### 高性能

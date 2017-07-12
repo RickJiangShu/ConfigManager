@@ -74,7 +74,7 @@ Deserializer.Deserialize(set);
 <br>
 并支持以上基础类型的所有**数组类型**。<br>
 例如：字符串数组类型是string[]，值是Hello,World<br>
-<br>
+
 # 优化建议
 1. 在Deserialize之后，把加载的序列化数据卸载掉。
 ```

@@ -1,5 +1,4 @@
-# ConfigManager
-一键使用Excel等表格配置<br>
+# ConfigManager：一键使用Excel等表格配置
 ![logo](https://raw.githubusercontent.com/RickJiangShu/ConfigManager-Example/master/Poster/Logo.jpg "logo")
 # 特点
 ### 高性能

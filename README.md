@@ -91,6 +91,6 @@ bundle.Unload(true);//AssetBundle卸载内存
 2. 注意GetKeys()、GetValues()是Copy一个数组出来，所以做好缓存的工作。
 
 # 贡献者名单
-如果你有任何Bug、问题和意见请在Issues里提出来，有时间一定立马回复，意见一经采纳就被列入“贡献者名单”。
+如果你有任何Bug、问题和意见请在Issues或[蛮牛](http://www.manew.com/thread-105598-1-1.html "一键读取Txt、Excel等表格配置【源码+原理】")里提出来，有时间一定立马回复，意见一经采纳就被列入“贡献者名单”。
 1. LiGo 提供希望支持cvs的建议
 2. k1104480005 提供希望支持Get所有数据的方法

@@ -21,6 +21,12 @@
 ```
 SerializableSet set = Resources.Load<SerializableSet>("SerializableSet");
 Deserializer.Deserialize(set);
+
+/* 与加载解耦，不依赖加载方式
+AssetBundle bundle = AssetBundle.LoadFromFile(Application.streamingAssetsPath + "/config.ab");
+set = bundle.LoadAsset<SerializableSet>("SerializableSet");
+Deserializer.Deserialize(set);
+*/
         
 MonsterConfig monsterCfg = MonsterConfig.Get(210102)
 print(monsterCfg.name);

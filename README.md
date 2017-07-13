@@ -1,4 +1,10 @@
 # ConfigManager：一键使用Excel等表格配置
+1. 您是否需要在项目中使用txt、Excel等表格配置？
+2. 您是否还在一行行写配置解析代码？
+3. 您是否担心运行时解析速度？
+
+本工具一键轻松解决您以上的这些问题。
+
 ![logo](https://raw.githubusercontent.com/RickJiangShu/ConfigManager-Example/master/Poster/Logo.jpg "logo")
 
 # 快速使用

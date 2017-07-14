@@ -56,6 +56,8 @@ Deserializer.Deserialize(set);
 ```
 ### 支持多种格式
 目前支持的格式有：*.txt *.cvs<br>
+未来支持：*.json *.xml，请关注~<br>
+
 ### 直接配置数据类型
 支持所有C#值类型和数组类型，合理运用有助于减少内存占用。<br>
 

@@ -55,7 +55,7 @@ SerializableSet set = bundle.LoadAsset<SerializableSet>("SerializableSet");
 Deserializer.Deserialize(set);
 ```
 ### 支持多种格式
-目前支持的格式有：.txt .cvs<br>
+目前支持的格式有：.txt .csv<br>
 未来支持：.json .xml，请关注~<br>
 
 ### 直接配置数据类型

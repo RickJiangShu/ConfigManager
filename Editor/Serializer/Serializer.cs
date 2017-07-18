@@ -15,7 +15,7 @@ namespace ConfigManagerEditor
     /// </summary>
     public class Serializer
     {
-        public static object Serialize(List<Source> sources)
+        public static object Serialize(List<SheetSource> sheets)
         {
             Type t = FindType("SerializableSet");
             if (t == null)
@@ -26,10 +26,10 @@ namespace ConfigManagerEditor
 
             object set = UnityEngine.ScriptableObject.CreateInstance(t);
 
-            foreach(Source source in sources)
+            foreach (SheetSource sheet in sheets)
             {
-                string fieldName = source.sourceName + "s";
-                Array configs = Source2Configs(source);
+                string fieldName = sheet.sourceName + "s";
+                Array configs = Source2Configs(sheet);
                 FieldInfo fieldInfo = t.GetField(fieldName);
                 fieldInfo.SetValue(set,configs);
             }
@@ -40,7 +40,7 @@ namespace ConfigManagerEditor
         /// 从源数据反射为对应的配置数组
         /// </summary>
         /// <returns></returns>
-        private static Array Source2Configs(Source source)
+        private static Array Source2Configs(SheetSource source)
         {
             Type configType = FindType(source.configName);
 

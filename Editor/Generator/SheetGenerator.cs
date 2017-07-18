@@ -14,7 +14,7 @@ namespace ConfigManagerEditor
     /// <summary>
     /// Config解析器，负责将txt解析成*.cs
     /// </summary>
-    public class ConfigGenerator
+    public class SheetGenerator
     {
         private static string templete =
 @"using System.Collections.Generic;
@@ -80,9 +80,9 @@ public class /*ClassName*/
         /// <summary>
         /// 生成Config
         /// </summary>
-        public static void Generate(List<Source> sources, string outputFolder)
+        public static void Generate(List<SheetSource> sheets, string outputFolder)
         {
-            foreach (Source src in sources)
+            foreach (SheetSource src in sheets)
             {
                 string content = templete;
                 string outputPath = outputFolder + "/" + src.configName + ".cs";

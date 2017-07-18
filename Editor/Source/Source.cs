@@ -25,20 +25,12 @@ namespace ConfigManagerEditor
         /// 配置的文件名
         /// </summary>
         public string configName;
+    }
 
-        /// <summary>
-        /// 解析出来的矩阵
-        /// </summary>
-        public string[,] matrix;
-
-        /// <summary>
-        /// 行
-        /// </summary>
-        public int row;
-
-        /// <summary>
-        /// 列
-        /// </summary>
-        public int column;
+    public enum SourceType
+    {
+        Sheet,//表格 txt xml xls xlxs
+        JSON,
+        XML,
     }
 }

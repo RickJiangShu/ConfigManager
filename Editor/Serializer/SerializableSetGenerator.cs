@@ -24,17 +24,17 @@ public class SerializableSet : UnityEngine.ScriptableObject
 @"    public /*ConfigName*/[] /*SourceName*/s;
 ";
 
-        public static void Generate(List<Source> sources, string outputFolder)
+        public static void Generate(List<SheetSource> sheets, string outputFolder)
         {
             string outputPath = outputFolder + "/SerializableSet.cs";
             string content = templete;
 
             string declareConfigs = "";
-            foreach (Source src in sources)
+            foreach (Source sheet in sheets)
             {
                 string declare = templete2;
-                declare = declare.Replace("/*ConfigName*/", src.configName);
-                declare = declare.Replace("/*SourceName*/", src.sourceName);
+                declare = declare.Replace("/*ConfigName*/", sheet.configName);
+                declare = declare.Replace("/*SourceName*/", sheet.sourceName);
                 declareConfigs += declare;
             }
 

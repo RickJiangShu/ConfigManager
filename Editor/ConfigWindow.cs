@@ -138,17 +138,22 @@ namespace ConfigManagerEditor
             if (!Directory.Exists(cache.configOutputFolder))
                 Directory.CreateDirectory(cache.configOutputFolder);
 
-            //源
-            List<Source> sources = GetSources();
+            //获取源
+            List<SheetSource> sheets;//表格
+            List<JSONSource> jsons;//JSON
 
-            //生产Configs
-            ConfigGenerator.Generate(sources, cache.configOutputFolder);
+            GetSources(out sheets,out jsons);
+
+
+            SheetGenerator.Generate(sheets, cache.configOutputFolder);//生产Configs
+            //生成JSONs
+
 
             //生产SerializableSet
-            SerializableSetGenerator.Generate(sources, cache.configOutputFolder);
+            SerializableSetGenerator.Generate(sheets, cache.configOutputFolder);
 
             //生产Deserializer
-            DeserializerGenerator.Generate(sources, cache.configOutputFolder);
+            DeserializerGenerator.Generate(sheets, cache.configOutputFolder);
 
             //刷新
             AssetDatabase.Refresh();
@@ -210,61 +215,41 @@ namespace ConfigManagerEditor
         /// 获取所有源
         /// </summary>
         /// <returns></returns>
-        private List<Source> GetSources()
+        private void GetSources(out List<SheetSource> sheets,out List<JSONSource> jsons)
         {
             //获取所有配置文件
             DirectoryInfo directory = new DirectoryInfo(cache.sourceFolder);
-
             FileInfo[] files = directory.GetFiles("*.*", SearchOption.AllDirectories);
 
-            //可选选项
-            string sv;
-            string lf;
 
             //源
-            List<Source> sources = new List<Source>();
+            sheets = new List<SheetSource>();
+            jsons = new List<JSONSource>();
+
             for (int i = 0, l = files.Length; i < l; i++)
             {
                 FileInfo file = files[i];
-                if (file.Extension != ".txt" && file.Extension != ".csv")
+                SourceType type;
+                if (!TypeEnabled(file.Extension,out type))
                     continue;
-
-                Source source = new Source();
 
                 string content;
                 byte[] bytes;
                 ConfigTools.ReadFile(file.FullName, out bytes);
                 ConfigTools.DetectTextEncoding(bytes, out content);//转换不同的编码格式
 
-                //判断换行符
-                if (content.IndexOf("\r\n") != -1)
-                    lf = "\r\n";
-                else
-                    lf = "\n";
-
-                //判断分割符
-                if (content.IndexOf("\t") != -1)
-                    sv = "\t";
-                else
-                    sv = ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)";//Fork:https://stackoverflow.com/questions/6542996/how-to-split-csv-whose-columns-may-contain
-
-                //写入源
-                source.content = content;
-                source.sourceName = file.Name.Replace(file.Extension, "");//文件名
-                source.configName = source.sourceName + "Config";//类名
-                try
+                switch(type)
                 {
-                    source.matrix = ConfigTools.Content2Matrix(source.content, sv, lf, out source.row, out source.column);
+                    case SourceType.Sheet:
+                        SheetSource source = SheetParser.Parse(content, file.Name);
+                        if (source != null) sheets.Add(source);
+                        break;
+                    case SourceType.JSON:
+                        JSONSource json = JSONParser.Parse(content, file.Name);
+                        if (json != null) jsons.Add(json);
+                        break;
                 }
-                catch
-                {
-                    Debug.LogError(file.Name + "解析失败！请检查格式是否正确");
-                    continue;
-                }
-
-                sources.Add(source);
             }
-            return sources;
         }
 
         /// <summary>
@@ -279,17 +264,44 @@ namespace ConfigManagerEditor
             }
 
             //无法缓存只能重新获取
-            List<Source> sources = GetSources();
+            List<SheetSource> sheets;
+            List<JSONSource> jsons;
+            GetSources(out sheets, out jsons);
 
             //通过反射序列化
-            UnityEngine.Object set = (UnityEngine.Object)Serializer.Serialize(sources);
+            UnityEngine.Object set = (UnityEngine.Object)Serializer.Serialize(sheets);
             string o = cache.assetOutputFolder + "/" + assetName;
             AssetDatabase.CreateAsset(set, o);
 
             Debug.Log("序列化完成！");
         }
 
-        
+        /// <summary>
+        /// 检测类型是否启用
+        /// </summary>
+        /// <param name="extension"></param>
+        /// <returns></returns>
+        private bool TypeEnabled(string extension,out SourceType type)
+        {
+            type = SourceType.Sheet;
+            switch(extension)
+            {
+                case ".txt":
+                    return cache.txtEnabled;
+                case ".csv":
+                    return cache.csvEnabled;
+                case ".json":
+                    type = SourceType.JSON;
+                    return cache.jsonEnabled;
+                case ".xml":
+                    type = SourceType.XML;
+                    return cache.xmlEnabled;
+                case ".xls":
+                case ".xlsx":
+                    return cache.xlEnabled;
+            }
+            return false;
+        }
     }
 
     [System.Serializable]

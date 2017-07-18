@@ -245,40 +245,7 @@ namespace ConfigManagerEditor
         #endregion
 
 
-        /// <summary>
-        /// 从配置转换成矩阵数组（0行1列）
-        /// </summary>
-        /// <param name="config">配置文件</param>
-        /// <param name="sv">分隔符 Separated Values</param>
-        /// <param name="lf">换行符 Line Feed</param>
-        /// <returns></returns>
-        public static string[,] Content2Matrix(string config, string sv, string lf, out int row, out int col)
-        {
-            config = config.Trim();//清空末尾的空白
-
-            //分割
-            string[] lines = Regex.Split(config, lf);
-            string[] firstLine = Regex.Split(lines[0], sv, RegexOptions.Compiled);
-            
-            row = lines.Length;
-            col = firstLine.Length;
-            string[,] matrix = new string[row, col];
-            //为第一行赋值
-            for (int i = 0, l = firstLine.Length; i < l; i++)
-            {
-                matrix[0, i] = firstLine[i];
-            }
-            //为其他行赋值
-            for (int i = 1, l = lines.Length; i < l; i++)
-            {
-                string[] line = Regex.Split(lines[i], sv);
-                for (int j = 0, k = line.Length; j < k; j++)
-                {
-                    matrix[i, j] = line[j];
-                }
-            }
-            return matrix;
-        }
+        
 
 
         /// <summary>

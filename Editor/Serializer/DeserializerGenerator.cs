@@ -33,20 +33,20 @@ namespace ConfigManagerEditor
         }
 ";
 
-        public static void Generate(List<Source> sources,string outputFolder)
+        public static void Generate(List<SheetSource> sheets,string outputFolder)
         {
             string outputPath = outputFolder + "/Deserializer.cs";
             string content = templete;
 
 
             string setDictionaries = "";
-            foreach (Source src in sources)
+            foreach (SheetSource sheet in sheets)
             {
-                string idField = src.matrix[2, 0];
+                string idField = sheet.matrix[2, 0];
                 string setScript = templete2;
 
-                setScript = setScript.Replace("/*ConfigName*/", src.configName);
-                setScript = setScript.Replace("/*SourceName*/", src.sourceName);
+                setScript = setScript.Replace("/*ConfigName*/", sheet.configName);
+                setScript = setScript.Replace("/*SourceName*/", sheet.sourceName);
                 setScript = setScript.Replace("/*IDField*/", idField);
 
                 setDictionaries += setScript;

@@ -244,7 +244,15 @@ namespace ConfigManagerEditor
                 source.content = content;
                 source.sourceName = file.Name.Replace(file.Extension, "");//文件名
                 source.configName = source.sourceName + "Config";//类名
-                source.matrix = ConfigTools.Content2Matrix(source.content, sv, lf, out source.row, out source.column);
+                try
+                {
+                    source.matrix = ConfigTools.Content2Matrix(source.content, sv, lf, out source.row, out source.column);
+                }
+                catch
+                {
+                    Debug.LogError(file.Name + "解析失败！请检查格式是否正确");
+                    continue;
+                }
 
                 sources.Add(source);
             }
@@ -279,7 +287,7 @@ namespace ConfigManagerEditor
     [System.Serializable]
     public class Cache
     {
-        public string sourceFolder = "Assets";
+        public string sourceFolder = "Assets/Config";
         public string configOutputFolder = "Assets/Scripts/Config";
         public string assetOutputFolder = "Assets/Resources";
     }

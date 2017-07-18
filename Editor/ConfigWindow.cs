@@ -67,6 +67,16 @@ namespace ConfigManagerEditor
             cache.configOutputFolder = EditorGUILayout.TextField("Config Output", cache.configOutputFolder);
             cache.assetOutputFolder = EditorGUILayout.TextField("Asset Output", cache.assetOutputFolder);
 
+            //Source Type
+            EditorGUILayout.Space();
+            GUILayout.Label("Source Type", EditorStyles.boldLabel);
+
+            cache.txtEnabled = EditorGUILayout.Toggle("*.txt", cache.txtEnabled);
+            cache.csvEnabled = EditorGUILayout.Toggle("*.csv", cache.csvEnabled);
+            cache.jsonEnabled = EditorGUILayout.Toggle("*.json", cache.jsonEnabled);
+            cache.xmlEnabled = EditorGUILayout.Toggle("*.xml", cache.xmlEnabled);
+            cache.xlEnabled = EditorGUILayout.Toggle("*.xls & *.xlsx", cache.xlEnabled);
+
             //Operation
             EditorGUILayout.Space();
             GUILayout.Label("Operation", EditorStyles.boldLabel);
@@ -208,8 +218,6 @@ namespace ConfigManagerEditor
             FileInfo[] files = directory.GetFiles("*.*", SearchOption.AllDirectories);
 
             //可选选项
-
-
             string sv;
             string lf;
 
@@ -290,6 +298,12 @@ namespace ConfigManagerEditor
         public string sourceFolder = "Assets/Config";
         public string configOutputFolder = "Assets/Scripts/Config";
         public string assetOutputFolder = "Assets/Resources";
+
+        public bool txtEnabled = true;
+        public bool csvEnabled = true;
+        public bool jsonEnabled = true;
+        public bool xmlEnabled = true;
+        public bool xlEnabled = true;//*.xls & *.xlsx
     }
 }
 

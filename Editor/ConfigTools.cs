@@ -323,6 +323,7 @@ namespace ConfigManagerEditor
             return content;
         }
 
+        private static Encoding gb2312 = Encoding.GetEncoding("gb2312");
         // Function to detect the encoding for UTF-7, UTF-8/16/32 (bom, no bom, little
         // & big endian), and local default codepage, and potentially other codepages.
         // 'taster' = number of bytes to check of the file (to save processing). Higher
@@ -416,8 +417,8 @@ namespace ConfigManagerEditor
             // definitely) the user's local codepage! One might present to the user a
             // list of alternative encodings as shown here: https://stackoverflow.com/questions/8509339/what-is-the-most-common-encoding-of-each-language
             // A full list can be found using Encoding.GetEncodings();
-            text = Encoding.Default.GetString(b);
-            return Encoding.Default;
+            text = gb2312.GetString(b);
+            return gb2312;
         }
     }
 }

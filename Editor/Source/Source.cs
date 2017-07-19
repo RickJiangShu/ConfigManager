@@ -22,9 +22,9 @@ namespace ConfigManagerEditor
         public string sourceName;
 
         /// <summary>
-        /// 配置的文件名
+        /// 类名
         /// </summary>
-        public string configName;
+        public string className;
     }
 
     public enum SourceType

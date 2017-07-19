@@ -13,32 +13,47 @@ namespace ConfigManagerEditor
     /// </summary>
     public class SerializableSetGenerator
     {
-        private const string templete =
+        private const string template =
 @"[System.Serializable]
 public class SerializableSet : UnityEngine.ScriptableObject
 {
-/*DeclareConfigs*/
+/*ConfigDeclarations*/
+/*JSONDeclarations*/
 }
 ";
-        private const string templete2 = 
+        private const string template2 = 
 @"    public /*ConfigName*/[] /*SourceName*/s;
 ";
+        private const string template3 =
+@"    public /*JSONName*/ /*SourceName*/;
+";
 
-        public static void Generate(List<SheetSource> sheets, string outputFolder)
+        public static void Generate(List<SheetSource> sheets,List<JSONSource> jsons, string outputFolder)
         {
             string outputPath = outputFolder + "/SerializableSet.cs";
-            string content = templete;
+            string content = template;
 
-            string declareConfigs = "";
-            foreach (Source sheet in sheets)
+            //Sheet声明
+            string configDeclarations = "";
+            foreach (SheetSource sheet in sheets)
             {
-                string declare = templete2;
-                declare = declare.Replace("/*ConfigName*/", sheet.configName);
-                declare = declare.Replace("/*SourceName*/", sheet.sourceName);
-                declareConfigs += declare;
+                string declaration = template2;
+                declaration = declaration.Replace("/*ConfigName*/", sheet.className);
+                declaration = declaration.Replace("/*SourceName*/", sheet.sourceName);
+                configDeclarations += declaration;
             }
+            content = content.Replace("/*ConfigDeclarations*/", configDeclarations);
 
-            content = content.Replace("/*DeclareConfigs*/", declareConfigs);
+            //JSON声明
+            string jsonDeclarations = "";
+            foreach (JSONSource json in jsons)
+            {
+                string declaration = template3;
+                declaration = declaration.Replace("/*JSONName*/", json.className);
+                declaration = declaration.Replace("/*SourceName*/", json.sourceName);
+                jsonDeclarations += declaration;
+            }
+            content = content.Replace("/*JSONDeclarations*/", jsonDeclarations);
 
             ConfigTools.WriteFile(outputPath, content);
         }

@@ -34,19 +34,6 @@ namespace ConfigManagerEditor
             return EditorWindow.GetWindow<ConfigWindow>("Config Manager");
         }
 
-        //
-        private string[] sourceTypeOptions = new string[] { "txt(tsv)", "csv" };
-        private string[] lfOptions = new string[] { "as Source", "CR LF", "LF" };
-
-        /// <summary>
-        /// 对应ConfigType的分隔符
-        /// </summary>
-        private string[] separatedValues = new string[] { "\t", "," };
-        /// <summary>
-        /// 对应lfOptions的换行符
-        /// </summary>
-        private string[] lineFeed = new string[] { "\r\n", "\n" };
-
         /// <summary>
         /// 缓存数据
         /// </summary>
@@ -136,7 +123,13 @@ namespace ConfigManagerEditor
         {
             //检出输出目录
             if (!Directory.Exists(cache.configOutputFolder))
+            {
                 Directory.CreateDirectory(cache.configOutputFolder);
+            }
+            if (!Directory.Exists(cache.serializerOutputFolder))
+            {
+                Directory.CreateDirectory(cache.serializerOutputFolder);
+            }
 
             //获取源
             List<SheetSource> sheets;//表格
@@ -144,16 +137,20 @@ namespace ConfigManagerEditor
 
             GetSources(out sheets,out jsons);
 
+            if (sheets.Count == 0 && jsons.Count == 0)
+            {
+                Debug.LogError(cache.sourceFolder + "没有找到任何文件！");
+                return;
+            }
 
             SheetGenerator.Generate(sheets, cache.configOutputFolder);//生产Configs
-            //生成JSONs
-
-
+            JSONGenerator.Generate(jsons, cache.configOutputFolder);//生成JSONs
+            
             //生产SerializableSet
-            SerializableSetGenerator.Generate(sheets, cache.configOutputFolder);
+            SerializableSetGenerator.Generate(sheets, jsons, cache.serializerOutputFolder);
 
             //生产Deserializer
-            DeserializerGenerator.Generate(sheets, cache.configOutputFolder);
+            DeserializerGenerator.Generate(sheets, jsons, cache.serializerOutputFolder);
 
             //刷新
             AssetDatabase.Refresh();
@@ -238,15 +235,35 @@ namespace ConfigManagerEditor
                 ConfigTools.ReadFile(file.FullName, out bytes);
                 ConfigTools.DetectTextEncoding(bytes, out content);//转换不同的编码格式
 
+                if (string.IsNullOrEmpty(content))
+                {
+                    Debug.LogWarning(file.Name + "内容为空！");
+                    continue;
+                }
+
                 switch(type)
                 {
                     case SourceType.Sheet:
-                        SheetSource source = SheetParser.Parse(content, file.Name);
-                        if (source != null) sheets.Add(source);
+                        try
+                        {
+                            SheetSource source = SheetParser.Parse(content, file.Name);
+                            sheets.Add(source);
+                        }
+                        catch(Exception e)
+                        {
+                            UnityEngine.Debug.LogError(file.Name + "解析失败！请检查格式是否正确，如果格式正确请联系作者：https://github.com/RickJiangShu/ConfigManager/issues" + "\n" + e);
+                        }
                         break;
                     case SourceType.JSON:
-                        JSONSource json = JSONParser.Parse(content, file.Name);
-                        if (json != null) jsons.Add(json);
+                        try
+                        {
+                            JSONSource json = JSONParser.Parse(content, file.Name);
+                            jsons.Add(json);
+                        }
+                        catch (Exception e)
+                        {
+                            UnityEngine.Debug.LogError(file.Name + "解析失败！请检查格式是否正确，如果格式正确请联系作者：https://github.com/RickJiangShu/ConfigManager/issues" + "\n" + e);
+                        }
                         break;
                 }
             }
@@ -269,7 +286,7 @@ namespace ConfigManagerEditor
             GetSources(out sheets, out jsons);
 
             //通过反射序列化
-            UnityEngine.Object set = (UnityEngine.Object)Serializer.Serialize(sheets);
+            UnityEngine.Object set = (UnityEngine.Object)Serializer.Serialize(sheets, jsons);
             string o = cache.assetOutputFolder + "/" + assetName;
             AssetDatabase.CreateAsset(set, o);
 
@@ -316,6 +333,8 @@ namespace ConfigManagerEditor
         public bool jsonEnabled = true;
         public bool xmlEnabled = true;
         public bool xlEnabled = true;//*.xls & *.xlsx
+
+        public string serializerOutputFolder { get { return configOutputFolder + "/Serializer"; } }
     }
 }
 

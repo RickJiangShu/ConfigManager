@@ -85,7 +85,7 @@ public class /*ClassName*/
             foreach (SheetSource src in sheets)
             {
                 string content = templete;
-                string outputPath = outputFolder + "/" + src.configName + ".cs";
+                string outputPath = outputFolder + "/" + src.className + ".cs";
 
                 string idType = ConfigTools.SourceType2CSharpType(src.matrix[1, 0]);
                 string idField = src.matrix[2, 0];
@@ -102,7 +102,7 @@ public class /*ClassName*/
                 }
 
                 //替换
-                content = content.Replace("/*ClassName*/", src.configName);
+                content = content.Replace("/*ClassName*/", src.className);
                 content = content.Replace("/*DeclareProperties*/", declareProperties);
                 content = content.Replace("/*IDType*/", idType);
                 content = content.Replace("/*IDField*/", idField);

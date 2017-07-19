@@ -19,7 +19,7 @@ namespace ConfigManagerEditor
         //解析键值对
         internal const string regexPairOf = @"\s*" + regexString + @"\s*:\s*";//\s*"([^"]*)"\s*:\s*
 
-        internal const string regexPairOfObject = regexPairOf + regexObject;//\s*"([^"]*)"\s*:\s*\{([^}]*)\}
+        internal const string regexPairOfObject = regexPairOf + regexObject + @"(?![^\]]*\])";
         internal const string regexPairOfArray = regexPairOf + regexArray;
         internal const string regexPairOfString = regexPairOf + regexString;
         internal const string regexPairOfNumber = regexPairOf + regexNumber;
@@ -44,7 +44,7 @@ namespace ConfigManagerEditor
 
             source.content = content;
             source.sourceName = fileName.Substring(0, fileName.LastIndexOf('.')); ;//文件名
-            source.configName = source.sourceName + "JSON";//类名
+            source.className = source.sourceName + "JSON";//类名
 
             source.obj = ParseRoot(content);
             return source;

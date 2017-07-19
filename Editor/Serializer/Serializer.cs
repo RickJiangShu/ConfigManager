@@ -15,7 +15,7 @@ namespace ConfigManagerEditor
     /// </summary>
     public class Serializer
     {
-        public static object Serialize(List<SheetSource> sheets)
+        public static object Serialize(List<SheetSource> sheets,List<JSONSource> jsons)
         {
             Type t = FindType("SerializableSet");
             if (t == null)
@@ -26,12 +26,26 @@ namespace ConfigManagerEditor
 
             object set = UnityEngine.ScriptableObject.CreateInstance(t);
 
-            foreach (SheetSource sheet in sheets)
+            //Config
+            foreach (SheetSource source in sheets)
             {
-                string fieldName = sheet.sourceName + "s";
-                Array configs = Source2Configs(sheet);
+                string fieldName = source.sourceName + "s";
+                Array configs = Source2Configs(source);
                 FieldInfo fieldInfo = t.GetField(fieldName);
                 fieldInfo.SetValue(set,configs);
+            }
+
+            //JSON
+            foreach (JSONSource source in jsons)
+            {
+                string fieldName = source.sourceName;
+
+                //使用 FromJson 获取json对象
+                Type jsonType = FindType(source.className);
+                object jsonObj = UnityEngine.JsonUtility.FromJson(source.content, jsonType);
+
+                FieldInfo fieldInfo = t.GetField(fieldName);
+                fieldInfo.SetValue(set, jsonObj);
             }
             return set;
         }
@@ -42,7 +56,7 @@ namespace ConfigManagerEditor
         /// <returns></returns>
         private static Array Source2Configs(SheetSource source)
         {
-            Type configType = FindType(source.configName);
+            Type configType = FindType(source.className);
 
             int count = source.row - 3;
             Array configs = Array.CreateInstance(configType, count);

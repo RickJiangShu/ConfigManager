@@ -33,22 +33,9 @@ namespace ConfigManagerEditor
             //写入源
             source.content = content;
             source.sourceName = fileName.Substring(0,fileName.LastIndexOf('.')); ;//文件名
-            source.configName = source.sourceName + "Config";//类名
-            try
-            {
-                source.matrix = Content2Matrix(source.content, sv, lf, out source.row, out source.column);
-            }
-            catch
-            {
-                UnityEngine.Debug.LogError(fileName + "解析失败！请检查格式是否正确");
-                return null;
-            }
-
-            if (source.row < 3)
-            {
-                UnityEngine.Debug.LogError(fileName + "解析失败！行数少于3行");
-                return null;
-            }
+            source.className = source.sourceName + "Config";//类名
+            source.matrix = Content2Matrix(source.content, sv, lf, out source.row, out source.column);
+           
             return source;
         }
         /// <summary>

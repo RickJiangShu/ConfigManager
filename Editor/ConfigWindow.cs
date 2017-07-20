@@ -62,7 +62,7 @@ namespace ConfigManagerEditor
             cache.csvEnabled = EditorGUILayout.Toggle("*.csv", cache.csvEnabled);
             cache.jsonEnabled = EditorGUILayout.Toggle("*.json", cache.jsonEnabled);
             cache.xmlEnabled = EditorGUILayout.Toggle("*.xml", cache.xmlEnabled);
-            cache.xlEnabled = EditorGUILayout.Toggle("*.xls & *.xlsx", cache.xlEnabled);
+       //     cache.xlEnabled = EditorGUILayout.Toggle("*.xls & *.xlsx", cache.xlEnabled);
 
             //Operation
             EditorGUILayout.Space();

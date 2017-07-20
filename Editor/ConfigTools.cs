@@ -387,5 +387,18 @@ namespace ConfigManagerEditor
             text = gb2312.GetString(b);
             return gb2312;
         }
+
+        /// <summary>
+        /// 判断是否是数字
+        /// </summary>
+        /// <param name="Expression"></param>
+        /// <returns></returns>
+        public static bool IsNumeric(object Expression)
+        {
+            double retNum;
+
+            bool isNum = Double.TryParse(Convert.ToString(Expression), System.Globalization.NumberStyles.Any, System.Globalization.NumberFormatInfo.InvariantInfo, out retNum);
+            return isNum;
+        }
     }
 }

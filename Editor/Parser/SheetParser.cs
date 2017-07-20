@@ -30,6 +30,7 @@ namespace ConfigManagerEditor
             else
                 sv = ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)";//Fork:https://stackoverflow.com/questions/6542996/how-to-split-csv-whose-columns-may-contain
 
+
             //写入源
             source.content = content;
             source.sourceName = fileName.Substring(0,fileName.LastIndexOf('.')); ;//文件名

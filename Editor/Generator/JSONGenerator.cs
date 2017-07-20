@@ -216,6 +216,11 @@ public class /*ClassName*/
             public string name;
             public List<Declaration> declarations;//声明
 
+            /// <summary>
+            /// 对比
+            /// </summary>
+            /// <param name="ds"></param>
+            /// <returns></returns>
             public bool Equals(List<Declaration> ds)
             {
                 int l = declarations.Count;
@@ -225,7 +230,16 @@ public class /*ClassName*/
 
                 for (int i = 0; i < l; i++)
                 {
-                    if (declarations[i].type != ds[i].type || declarations[i].field != ds[i].field)
+                    bool isHave = false;
+                    for (int j = 0; j < k; j++)
+                    {
+                        if (declarations[i].type == ds[j].type && declarations[i].field == ds[j].field)
+                        {
+                            isHave = true;
+                            break;
+                        }
+                    }
+                    if (!isHave)
                         return false;
                 }
 

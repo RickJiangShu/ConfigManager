@@ -29,8 +29,7 @@ namespace ConfigManagerEditor
 
     public enum SourceType
     {
-        Sheet,//表格 txt xml xls xlxs
-        JSON,
-        XML,
+        Sheet,//表格型数据 txt csv
+        Struct,//结构型数据 json xml
     }
 }

@@ -8,9 +8,9 @@ namespace ConfigManagerEditor
 {
     using System.Collections.Generic;
     /// <summary>
-    /// JSONSource
+    /// 结构型数据源
     /// </summary>
-    public class JSONSource : Source
+    public class StructSource : Source
     {
         public Dictionary<string, object> obj;
     }

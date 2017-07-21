@@ -11,9 +11,9 @@ namespace ConfigManagerEditor
     using System.Text.RegularExpressions;
 
     /// <summary>
-    /// JSON解析器
+    /// Json解析器
     /// </summary>
-    public class JSONParser
+    public class JsonParser
     {
         #region 正则表达式
         //解析键值对
@@ -39,20 +39,20 @@ namespace ConfigManagerEditor
         internal const string regexBool = "(true|false|null)";
         #endregion
 
-        public static JSONSource Parse(string content,string fileName)
+        public static StructSource Parse(string content,string fileName)
         {
-            JSONSource source = new JSONSource();
+            StructSource source = new StructSource();
 
             source.content = content;
             source.sourceName = fileName.Substring(0, fileName.LastIndexOf('.')); ;//文件名
-            source.className = source.sourceName + "JSON";//类名
+            source.className = source.sourceName + "Json";//类名
 
             source.obj = ParseRoot(content);
             return source;
         }
 
         /// <summary>
-        /// 解析JSON入口
+        /// 解析Json入口
         /// </summary>
         /// <param name="json"></param>
         /// <returns></returns>

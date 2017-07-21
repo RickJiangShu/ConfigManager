@@ -133,24 +133,24 @@ namespace ConfigManagerEditor
 
             //获取源
             List<SheetSource> sheets;//表格
-            List<JSONSource> jsons;//JSON
+            List<StructSource> structs;//结构
 
-            GetSources(out sheets,out jsons);
+            GetSources(out sheets, out structs);
 
-            if (sheets.Count == 0 && jsons.Count == 0)
+            if (sheets.Count == 0 && structs.Count == 0)
             {
                 Debug.LogError(cache.sourceFolder + "没有找到任何文件！");
                 return;
             }
 
             SheetGenerator.Generate(sheets, cache.configOutputFolder);//生产Configs
-            StructGenerator.Generate(jsons, cache.configOutputFolder);//生成JSONs
+            StructGenerator.Generate(structs, cache.configOutputFolder);//生成Jsons
             
             //生产SerializableSet
-            SerializableSetGenerator.Generate(sheets, jsons, cache.serializerOutputFolder);
+            SerializableSetGenerator.Generate(sheets, structs, cache.serializerOutputFolder);
 
             //生产Deserializer
-            DeserializerGenerator.Generate(sheets, jsons, cache.serializerOutputFolder);
+            DeserializerGenerator.Generate(sheets, structs, cache.serializerOutputFolder);
 
             //刷新
             AssetDatabase.Refresh();
@@ -212,7 +212,7 @@ namespace ConfigManagerEditor
         /// 获取所有源
         /// </summary>
         /// <returns></returns>
-        private void GetSources(out List<SheetSource> sheets,out List<JSONSource> jsons)
+        private void GetSources(out List<SheetSource> sheets,out List<StructSource> structs)
         {
             //获取所有配置文件
             DirectoryInfo directory = new DirectoryInfo(cache.sourceFolder);
@@ -221,7 +221,7 @@ namespace ConfigManagerEditor
 
             //源
             sheets = new List<SheetSource>();
-            jsons = new List<JSONSource>();
+            structs = new List<StructSource>();
 
             for (int i = 0, l = files.Length; i < l; i++)
             {
@@ -254,11 +254,16 @@ namespace ConfigManagerEditor
                             UnityEngine.Debug.LogError(file.Name + "解析失败！请检查格式是否正确，如果格式正确请联系作者：https://github.com/RickJiangShu/ConfigManager/issues" + "\n" + e);
                         }
                         break;
-                    case SourceType.JSON:
+                    case SourceType.Struct:
                         try
                         {
-                            JSONSource json = JSONParser.Parse(content, file.Name);
-                            jsons.Add(json);
+                            StructSource st;
+                            if (file.Extension == ".json")
+                                st = JsonParser.Parse(content, file.Name);
+                            else
+                                st = XmlParser.Parse(content, file.Name);
+ 
+                            structs.Add(st);
                         }
                         catch (Exception e)
                         {
@@ -282,11 +287,11 @@ namespace ConfigManagerEditor
 
             //无法缓存只能重新获取
             List<SheetSource> sheets;
-            List<JSONSource> jsons;
-            GetSources(out sheets, out jsons);
+            List<StructSource> structs;
+            GetSources(out sheets, out structs);
 
             //通过反射序列化
-            UnityEngine.Object set = (UnityEngine.Object)Serializer.Serialize(sheets, jsons);
+            UnityEngine.Object set = (UnityEngine.Object)Serializer.Serialize(sheets, structs);
             string o = cache.assetOutputFolder + "/" + assetName;
             AssetDatabase.CreateAsset(set, o);
 
@@ -308,10 +313,10 @@ namespace ConfigManagerEditor
                 case ".csv":
                     return cache.csvEnabled;
                 case ".json":
-                    type = SourceType.JSON;
+                    type = SourceType.Struct;
                     return cache.jsonEnabled;
                 case ".xml":
-                    type = SourceType.XML;
+                    type = SourceType.Struct;
                     return cache.xmlEnabled;
                 case ".xls":
                 case ".xlsx":

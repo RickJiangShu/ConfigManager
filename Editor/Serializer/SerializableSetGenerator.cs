@@ -18,17 +18,17 @@ namespace ConfigManagerEditor
 public class SerializableSet : UnityEngine.ScriptableObject
 {
 /*ConfigDeclarations*/
-/*JSONDeclarations*/
+/*JsonDeclarations*/
 }
 ";
         private const string template2 = 
 @"    public /*ConfigName*/[] /*SourceName*/s;
 ";
         private const string template3 =
-@"    public /*JSONName*/ /*SourceName*/;
+@"    public /*JsonName*/ /*SourceName*/;
 ";
 
-        public static void Generate(List<SheetSource> sheets,List<JSONSource> jsons, string outputFolder)
+        public static void Generate(List<SheetSource> sheets,List<StructSource> jsons, string outputFolder)
         {
             string outputPath = outputFolder + "/SerializableSet.cs";
             string content = template;
@@ -44,16 +44,16 @@ public class SerializableSet : UnityEngine.ScriptableObject
             }
             content = content.Replace("/*ConfigDeclarations*/", configDeclarations);
 
-            //JSON声明
+            //Json声明
             string jsonDeclarations = "";
-            foreach (JSONSource json in jsons)
+            foreach (StructSource json in jsons)
             {
                 string declaration = template3;
-                declaration = declaration.Replace("/*JSONName*/", json.className);
+                declaration = declaration.Replace("/*JsonName*/", json.className);
                 declaration = declaration.Replace("/*SourceName*/", json.sourceName);
                 jsonDeclarations += declaration;
             }
-            content = content.Replace("/*JSONDeclarations*/", jsonDeclarations);
+            content = content.Replace("/*JsonDeclarations*/", jsonDeclarations);
 
             ConfigTools.WriteFile(outputPath, content);
         }

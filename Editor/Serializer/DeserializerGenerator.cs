@@ -22,7 +22,7 @@ namespace ConfigManagerEditor
     public static void Deserialize(SerializableSet set)
     {
 /*SetDictionaries*/
-/*SetJSONs*/
+/*SetJsons*/
     }
 }
 ";
@@ -37,7 +37,7 @@ namespace ConfigManagerEditor
 @"        /*ClassName*/.ins = set./*SourceName*/;
 ";
 
-        public static void Generate(List<SheetSource> sheets,List<JSONSource> jsons,string outputFolder)
+        public static void Generate(List<SheetSource> sheets,List<StructSource> jsons,string outputFolder)
         {
             string outputPath = outputFolder + "/Deserializer.cs";
             string content = template;
@@ -57,19 +57,19 @@ namespace ConfigManagerEditor
             }
 
             //jsons
-            string setJSONs = "";
-            foreach (JSONSource json in jsons)
+            string setJsons = "";
+            foreach (StructSource json in jsons)
             {
                 string setScript = template3;
                 setScript = setScript.Replace("/*ClassName*/", json.className);
                 setScript = setScript.Replace("/*SourceName*/", json.sourceName);
 
-                setJSONs += setScript;
+                setJsons += setScript;
             }
 
 
             content = content.Replace("/*SetDictionaries*/", setDictionaries);
-            content = content.Replace("/*SetJSONs*/", setJSONs);
+            content = content.Replace("/*SetJsons*/", setJsons);
 
             ConfigTools.WriteFile(outputPath, content);
         }

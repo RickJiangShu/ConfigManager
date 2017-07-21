@@ -41,16 +41,16 @@ public class /*ClassName*/
         
         //decalration
 
-        internal static List<JSONSubObject> subObjects;
+        internal static List<StructSubObject> subObjects;
         internal static uint subID;
 
-        public static void Generate(List<JSONSource> jsons, string outputFolder)
+        public static void Generate(List<StructSource> structs, string outputFolder)
         {
-            subObjects = new List<JSONSubObject>();
+            subObjects = new List<StructSubObject>();
             subID = 0;
 
-            //创建各个JSON
-            foreach (JSONSource src in jsons)
+            //创建各个Json
+            foreach (StructSource src in structs)
             {
                 string content = templateRoot;
                 string outputPath = outputFolder + "/" + src.className + ".cs";
@@ -69,10 +69,10 @@ public class /*ClassName*/
                 ConfigTools.WriteFile(outputPath, content);
             }
 
-            //创建JSONObject子类
+            //创建JsonObject子类
             string allSubClasses = "";
 
-            foreach (JSONSubObject subObj in subObjects)
+            foreach (StructSubObject subObj in subObjects)
             {
                 string declarations = CombineDeclarations(subObj.declarations);
                 string subClass = templateSubObject;
@@ -83,7 +83,7 @@ public class /*ClassName*/
             }
 
             //写入
-            ConfigTools.WriteFile(outputFolder + "/" + "JSONObjects.cs",allSubClasses);
+            ConfigTools.WriteFile(outputFolder + "/" + "StructObjects.cs",allSubClasses);
 
             subObjects = null;
         }
@@ -251,16 +251,16 @@ public class /*ClassName*/
         internal static string GetSubObject(List<Declaration> declarations)
         {
             //和已有的子对象进行比对
-            foreach (JSONSubObject subObj in subObjects)
+            foreach (StructSubObject subObj in subObjects)
             {
                 if (subObj.Equals(declarations))
                     return subObj.name;
             }
 
             //新建子对象
-            JSONSubObject subObject = new JSONSubObject();
+            StructSubObject subObject = new StructSubObject();
             subObject.id = ++subID;
-            subObject.name = "JSONObject" + subObject.id;
+            subObject.name = "StructObject" + subObject.id;
             subObject.declarations = declarations;
             subObjects.Add(subObject);
 
@@ -269,9 +269,9 @@ public class /*ClassName*/
 
 
         /// <summary>
-        /// JSONObject 子对象
+        /// JsonObject 子对象
         /// </summary>
-        internal class JSONSubObject
+        internal class StructSubObject
         {
             public uint id;
             public string name;

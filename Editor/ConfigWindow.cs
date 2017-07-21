@@ -144,7 +144,7 @@ namespace ConfigManagerEditor
             }
 
             SheetGenerator.Generate(sheets, cache.configOutputFolder);//生产Configs
-            JSONGenerator.Generate(jsons, cache.configOutputFolder);//生成JSONs
+            StructGenerator.Generate(jsons, cache.configOutputFolder);//生成JSONs
             
             //生产SerializableSet
             SerializableSetGenerator.Generate(sheets, jsons, cache.serializerOutputFolder);

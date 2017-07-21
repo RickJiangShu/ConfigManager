@@ -42,7 +42,7 @@ namespace ConfigManagerEditor
 
                 //使用 FromJson 获取json对象
                 Type jsonType = FindType(source.className);
-                object jsonObj = UnityEngine.JsonUtility.FromJson(source.content, jsonType);
+                object jsonObj = SerializeObject(jsonType, source.obj);
 
                 FieldInfo fieldInfo = t.GetField(fieldName);
                 fieldInfo.SetValue(set, jsonObj);
@@ -83,6 +83,104 @@ namespace ConfigManagerEditor
                 configs.SetValue(config, i);
             }
             return configs;
+        }
+
+
+        /// <summary>
+        /// 序列化结构对象
+        /// </summary>
+        /// <param name="inputObject"></param>
+        /// <returns></returns>
+        private static object SerializeObject(Type outputType,Dictionary<string, object> inputObject)
+        {
+            object obj = Activator.CreateInstance(outputType);
+
+            foreach (string field in inputObject.Keys)
+            {
+                FieldInfo fieldInfo = outputType.GetField(field);
+                Type fieldType = fieldInfo.FieldType;//生成类的类型
+
+                object value = inputObject[field];
+                Type type = value.GetType();//解析的类型
+             
+                //对象
+                if (type == typeof(Dictionary<string, object>))
+                {
+                    object subOjbect = SerializeObject(fieldType, (Dictionary<string, object>)value);
+                    fieldInfo.SetValue(obj, subOjbect);
+                }
+                //数组
+                else if (type.IsArray)
+                {
+                    object array = SerializeArray(fieldType, (object[])value);
+                    fieldInfo.SetValue(obj, array);
+                }
+                //String\Number\Bool
+                else
+                {
+                    fieldInfo.SetValue(obj, value);
+                }
+            }
+            return obj;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="outputType">FieldType</param>
+        /// <param name="inputArray">object[]</param>
+        /// <returns></returns>
+        private static object SerializeArray(Type outputType,object[] inputArray)
+        {
+            //普通数组
+            if (outputType.IsArray)
+            {
+                Type elementType = outputType.GetElementType();
+                Array outputArray = Array.CreateInstance(elementType, inputArray.Length);
+
+                if (inputArray[0].GetType() == typeof(Dictionary<string, object>))
+                {
+                    for (int i = 0; i < inputArray.Length; i++)
+                    {
+                        outputArray.SetValue(SerializeObject(elementType, (Dictionary<string, object>)inputArray[i]), i);
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < inputArray.Length; i++)
+                    {
+                        outputArray.SetValue(inputArray[i], i);
+                    }
+                }
+                return outputArray;
+            }
+            //自定义数组
+            else
+            {
+                object arrayObject = Activator.CreateInstance(outputType);
+                for (int i = 0, l = inputArray.Length; i < l; i++)
+                {
+                    string field = "arg" + i;
+                    FieldInfo fieldInfo = outputType.GetField(field);
+
+                    //对象
+                    if (inputArray[i].GetType() == typeof(Dictionary<string, object>))
+                    {
+                        object value = SerializeObject(fieldInfo.FieldType, (Dictionary<string, object>)inputArray[i]);
+                        fieldInfo.SetValue(arrayObject, value);
+                    }
+                    //数组
+                    else if (inputArray[i].GetType().IsArray)
+                    {
+                        fieldInfo.SetValue(arrayObject, SerializeArray(fieldInfo.FieldType, (object[])inputArray[i]));
+                    }
+                    else
+                    {
+                        fieldInfo.SetValue(arrayObject, inputArray[i]);
+                    }
+                }
+                return arrayObject;
+            }
         }
 
         /// <summary>

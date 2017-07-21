@@ -19,7 +19,7 @@ namespace ConfigManagerEditor
         //解析键值对
         internal const string regexPairOf = @"\s*" + regexString + @"\s*:\s*";//\s*"([^"]*)"\s*:\s*
 
-        internal const string regexPairOfObject = regexPairOf + regexObject + @"(?![^\]]*\])";
+        internal const string regexPairOfObject = regexPairOf + regexObject;
         internal const string regexPairOfArray = regexPairOf + regexArray;
         internal const string regexPairOfString = regexPairOf + regexString;
         internal const string regexPairOfNumber = regexPairOf + regexNumber;
@@ -27,7 +27,8 @@ namespace ConfigManagerEditor
 
 
         //对象
-        internal const string regexObject = @"\{((?>\{(?<c>)|[^\{\}]+|\}(?<-c>))*(?(c)(?!)))\}";//Fork：https://stackoverflow.com/questions/546433/regular-expression-to-match-outer-brackets
+        //internal const string regexObject = @"\{((?>\{(?<c>)|[^\{\}]+|\}(?<-c>))*(?(c)(?!)))\}";//Fork：https://stackoverflow.com/questions/546433/regular-expression-to-match-outer-brackets
+        internal const string regexObject = @"(?<!\[[\s\S]*)\{((?>\{(?<c>)|[^\{\}]+|\}(?<-c>))*(?(c)(?!)))\}";//前面不含[的{}
 
         //数组
         internal const string regexArray = @"\[((?>\[(?<c>)|[^\[\]]+|\](?<-c>))*(?(c)(?!)))\]";
@@ -96,10 +97,13 @@ namespace ConfigManagerEditor
         {
             List<Pair> membersList = new List<Pair>();
 
+            string original = content.ToString();
+
             //判断Object类型
             Pair[] pairsOfObject = ParsePairs(ref content, regexPairOfObject);
             foreach (Pair pair in pairsOfObject)
             {
+                pair.index = original.IndexOf(pair.content);
                 pair.value = ParseObject(ref pair.content);
             }
             membersList.AddRange(pairsOfObject);
@@ -108,6 +112,7 @@ namespace ConfigManagerEditor
             Pair[] pairsOfArray = ParsePairs(ref content, regexPairOfArray);
             foreach (Pair pair in pairsOfArray)
             {
+                pair.index = original.IndexOf(pair.content);
                 pair.value = ParseArray(ref pair.content);
             }
             membersList.AddRange(pairsOfArray);
@@ -116,6 +121,7 @@ namespace ConfigManagerEditor
             Pair[] pairsOfString = ParsePairs(ref content, regexPairOfString);
             foreach (Pair pair in pairsOfString)
             {
+                pair.index = original.IndexOf(pair.content);
                 pair.value = pair.content;
             }
             membersList.AddRange(pairsOfString);
@@ -124,7 +130,8 @@ namespace ConfigManagerEditor
             Pair[] pairsOfNumber = ParsePairs(ref content, regexPairOfNumber);
             foreach (Pair pair in pairsOfNumber)
             {
-                pair.value = ConvertNumber(pair.content);
+                pair.index = original.IndexOf(pair.content);
+                pair.value = ConfigTools.ConvertNumber(pair.content);
             }
             membersList.AddRange(pairsOfNumber);
 
@@ -132,9 +139,13 @@ namespace ConfigManagerEditor
             Pair[] pairsOfBool = ParsePairs(ref content, regexPairOfBool);
             foreach (Pair pair in pairsOfBool)
             {
-                pair.value = ConvertBool(pair.content);
+                pair.index = original.IndexOf(pair.content);
+                pair.value = ConfigTools.ConvertBool(pair.content);
             }
             membersList.AddRange(pairsOfBool);
+
+            //排序
+            membersList.Sort(Pair.Compare);
 
             return membersList.ToArray();
         }
@@ -148,12 +159,16 @@ namespace ConfigManagerEditor
         {
             List<object> array = new List<object>();
 
+            //排序
+            string original = content.ToString();
+            List<Sort> sorts = new List<Sort>();
+
             //Object
             MatchCollection matchObjects = MatchesAndRemove(ref content, regexObject);
             foreach (Match match in matchObjects)
             {
                 string s = match.Groups[1].Value;
-                array.Add(ParseObject(ref s));
+                sorts.Add(new Sort(original.IndexOf(s),ParseObject(ref s)));
             }
 
             //数组
@@ -161,7 +176,7 @@ namespace ConfigManagerEditor
             foreach (Match match in matchArraies)
             {
                 string s = match.Groups[1].Value;
-                array.Add(ParseArray(ref s));
+                sorts.Add(new Sort(original.IndexOf(s), ParseArray(ref s)));
             }
 
             //String
@@ -169,7 +184,7 @@ namespace ConfigManagerEditor
             foreach (Match match in matchStrings)
             {
                 string s = match.Groups[1].Value;
-                array.Add(s);
+                sorts.Add(new Sort(original.IndexOf(s), s));
             }
 
             //Number
@@ -177,7 +192,7 @@ namespace ConfigManagerEditor
             foreach (Match match in matchNumbers)
             {
                 string s = match.Groups[1].Value;
-                array.Add(ConvertNumber(s));
+                sorts.Add(new Sort(original.IndexOf(s), ConfigTools.ConvertNumber(s)));
             }
 
             //Bool
@@ -185,7 +200,14 @@ namespace ConfigManagerEditor
             foreach (Match match in matchBools)
             {
                 string s = match.Groups[1].Value;
-                array.Add(ConvertBool(s));
+                sorts.Add(new Sort(original.IndexOf(s), ConfigTools.ConvertBool(s)));
+            }
+
+            //进行排序
+            sorts.Sort(Sort.Compare);
+            foreach (Sort s in sorts)
+            {
+                array.Add(s.data);
             }
 
             return array.ToArray();
@@ -227,74 +249,7 @@ namespace ConfigManagerEditor
             return matches;
         }
 
-        #region 转换方法
-        /// <summary>
-        /// 转换Number
-        /// </summary>
-        /// <returns></returns>
-        internal static object ConvertNumber(string content)
-        {
-            //byte
-            byte bNum;
-            if (byte.TryParse(content, out bNum))
-                return bNum;
-
-            //sbyte
-            sbyte sbNum;
-            if (sbyte.TryParse(content, out sbNum))
-                return sbNum;
-
-            //ushort
-            ushort usNum;
-            if (ushort.TryParse(content, out usNum))
-                return usNum;
-
-            //short
-            short sNum;
-            if (short.TryParse(content, out sNum))
-                return sNum;
-
-            //uint
-            uint uiNum;
-            if (uint.TryParse(content, out uiNum))
-                return uiNum;
-
-            //int
-            int iNum;
-            if (int.TryParse(content, out iNum))
-                return iNum;
-
-            //ulong
-            ulong ulNum;
-            if (ulong.TryParse(content, out ulNum))
-                return ulNum;
-
-            //long
-            long lNum;
-            if (long.TryParse(content, out lNum))
-                return lNum;
-
-            //float
-            float fNum;
-            if (float.TryParse(content, out fNum))
-                return fNum;
-
-            //double
-            double dNum;
-            if (double.TryParse(content, out dNum))
-                return dNum;
-
-            return content;
-        }
-        /// <summary>
-        /// 转换Bool
-        /// </summary>
-        /// <returns></returns>
-        internal static bool ConvertBool(string content)
-        {
-            return content == "true";
-        }
-        #endregion
+        
 
         /// <summary>
         /// 键值对
@@ -304,10 +259,46 @@ namespace ConfigManagerEditor
             public string key;//键
             public string content;//转换之前的文本
             public object value;//转换后的值
+            public int index;//用于排序
             public Pair(string key, string content)
             {
                 this.key = key;
                 this.content = content;
+            }
+
+            public static int Compare(Pair a, Pair b)
+            {
+                if (a.index < b.index)
+                    return -1;
+                else if (a.index > b.index)
+                    return 1;
+                else
+                    return 0;
+            }
+        }
+
+        /// <summary>
+        /// 用来排序正则取到的字符
+        /// </summary>
+        internal class Sort
+        {
+            public int index;
+            public object data;
+
+            public Sort(int i, object data)
+            {
+                this.index = i;
+                this.data = data;
+            }
+
+            public static int Compare(Sort a, Sort b)
+            {
+                if (a.index < b.index)
+                    return -1;
+                else if (a.index > b.index)
+                    return 1;
+                else
+                    return 0;
             }
         }
     }

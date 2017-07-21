@@ -388,17 +388,180 @@ namespace ConfigManagerEditor
             return gb2312;
         }
 
+        #region 转换类型方法
+        public static object ConvertBaseObject(object obj)
+        {
+            return ConvertBaseObject(obj.ToString());
+        }
+
+        /// <summary>
+        /// 将字符串转换成 Number,Bool Or string
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        public static object ConvertBaseObject(string content)
+        {
+            if (IsNumber(content))
+                return ConvertNumber(content);
+
+            if (IsBool(content))
+                return ConvertBool(content);
+
+            return content;
+        }
+
+        public static object ConvertNumber(string content)
+        {
+            //byte
+            byte bNum;
+            if (byte.TryParse(content, out bNum))
+                return bNum;
+
+            //sbyte
+            sbyte sbNum;
+            if (sbyte.TryParse(content, out sbNum))
+                return sbNum;
+
+            //ushort
+            ushort usNum;
+            if (ushort.TryParse(content, out usNum))
+                return usNum;
+
+            //short
+            short sNum;
+            if (short.TryParse(content, out sNum))
+                return sNum;
+
+            //uint
+            uint uiNum;
+            if (uint.TryParse(content, out uiNum))
+                return uiNum;
+
+            //int
+            int iNum;
+            if (int.TryParse(content, out iNum))
+                return iNum;
+
+            //ulong
+            ulong ulNum;
+            if (ulong.TryParse(content, out ulNum))
+                return ulNum;
+
+            //long
+            long lNum;
+            if (long.TryParse(content, out lNum))
+                return lNum;
+
+            //float
+            float fNum;
+            if (float.TryParse(content, out fNum))
+                return fNum;
+
+            //double
+            double dNum;
+            if (double.TryParse(content, out dNum))
+                return dNum;
+
+            return content;
+        }
+        /// <summary>
+        /// 转换Bool
+        /// </summary>
+        /// <returns></returns>
+        public static bool ConvertBool(string content)
+        {
+            return content == "true";
+        }
+        #endregion
+
+        #region 判断类型方法
         /// <summary>
         /// 判断是否是数字
         /// </summary>
         /// <param name="Expression"></param>
         /// <returns></returns>
-        public static bool IsNumeric(object Expression)
+        public static bool IsNumber(string content)
         {
             double retNum;
 
-            bool isNum = Double.TryParse(Convert.ToString(Expression), System.Globalization.NumberStyles.Any, System.Globalization.NumberFormatInfo.InvariantInfo, out retNum);
+            bool isNum = Double.TryParse(content, System.Globalization.NumberStyles.Any, System.Globalization.NumberFormatInfo.InvariantInfo, out retNum);
             return isNum;
+        }
+
+        public static bool IsNumber(Type t)
+        {
+            switch (Type.GetTypeCode(t))
+            {
+                case TypeCode.Byte:
+                case TypeCode.SByte:
+                case TypeCode.UInt16:
+                case TypeCode.UInt32:
+                case TypeCode.UInt64:
+                case TypeCode.Int16:
+                case TypeCode.Int32:
+                case TypeCode.Int64:
+                case TypeCode.Decimal:
+                case TypeCode.Double:
+                case TypeCode.Single:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>
+        /// 判断字符串是否是Bool
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        public static bool IsBool(string content)
+        {
+            return content == "true" || content == "false" || content == "null";
+        }
+        #endregion
+    
+        /// <summary>
+        /// 在数组中找到最小的数字类型
+        /// </summary>
+        /// <returns></returns>
+        public static Type FindMinimalNumberType(object[] array)
+        {
+            if (FindParseSuccess<byte>(array, byte.TryParse))
+                return typeof(byte);
+
+            if (FindParseSuccess<sbyte>(array, sbyte.TryParse))
+                return typeof(sbyte);
+
+            if (FindParseSuccess<ushort>(array, ushort.TryParse))
+                return typeof(ushort);
+
+            if (FindParseSuccess<short>(array, short.TryParse))
+                return typeof(short);
+
+            if (FindParseSuccess<uint>(array, uint.TryParse))
+                return typeof(uint);
+
+            if (FindParseSuccess<int>(array, int.TryParse))
+                return typeof(int);
+
+            if (FindParseSuccess<float>(array, float.TryParse))
+                return typeof(float);
+
+            return typeof(double);
+        }
+
+        public delegate bool TryParseHandler<T>(string value, out T result);
+        public static bool FindParseSuccess<T>(object[] array,TryParseHandler<T> tryParse)
+        {
+            foreach (object item in array)
+            {
+                T v;
+                if (!tryParse(item.ToString(), out v))
+                {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }

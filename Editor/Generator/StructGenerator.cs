@@ -12,9 +12,9 @@ namespace ConfigManagerEditor
     using UnityEngine;
 
     /// <summary>
-    /// JSONGenerator
+    /// 结构化配置生成器
     /// </summary>
-    public class JSONGenerator
+    public class StructGenerator
     {
         private const string templateRoot =
 @"[System.Serializable]
@@ -99,35 +99,13 @@ public class /*ClassName*/
             foreach (string field in obj.Keys)
             {
                 object value = obj[field];
-                Type type = value.GetType();
-
-                string typeStr = "";
-                //对象
-                if (type == typeof(Dictionary<string, object>))
-                {
-                    string subObjName = GetSubObject((Dictionary<string, object>)value);
-                    typeStr = subObjName;
-                }
-                //数组
-                else if (type.IsArray)
-                {
-                    //检测是否需要添加子类
-                    object[] array = (object[])value;
-                    typeStr = DeclareArray(array);
-                    
-                }
-                else
-                {
-                    //字符串、Number、Bool
-                    typeStr = type.ToString();
-                }
+                string typeStr = GetDeclarationType(value);
 
                 Declaration declaration = new Declaration();
                 declaration.type = typeStr;
                 declaration.field = field;
                 declarations.Add(declaration);
             }
-
 
             return declarations;
         }
@@ -138,14 +116,62 @@ public class /*ClassName*/
         /// <param name="array"></param>
         internal static string DeclareArray(object[] array)
         {
-            /*
-               注意：
-               由于要考虑序列化的问题 http://answers.unity3d.com/questions/1322769/parsing-nested-arrays-with-jsonutility.html
-               1.不支持多类型数组
-               2.不支持嵌套数组
-               可以通过配置层面解决这两个问题，即把“多类型数组”和“嵌套数组”配置成Object
-             */
+            //判断是否需要创建Array类
+            bool arrayClass = false;
+            Type lt = null;
+            foreach (object item in array)
+            {
+                Type t = item.GetType();
+                if (t.IsArray)
+                {
+                    arrayClass = true;
+                    break;
+                }
+                if (lt != null && lt != t)
+                {
+                    //数字类型不同不算
+                    if (!ConfigTools.IsNumber(lt) || !ConfigTools.IsNumber(t))
+                    {
+                        arrayClass = true;
+                        break;
+                    }
+                }
+                lt = t;
+            }
 
+            //普通数组
+            if (!arrayClass)
+            {
+                Type firstType = array[0].GetType();
+                if (firstType == typeof(Dictionary<string, object>))
+                {
+                    return GetSubObject((Dictionary<string, object>)array[0]) + "[]";
+                }
+                if (ConfigTools.IsNumber(firstType))//数字
+                {
+                    return ConfigTools.FindMinimalNumberType(array).ToString() + "[]";
+                }
+                else
+                {
+                    //string bool
+                    return firstType.ToString() + "[]";
+                }
+            }
+            else//创建数组对象
+            {
+                List<Declaration> declarations = new List<Declaration>();
+                int i = 0;
+                foreach (object item in array)
+                {
+                    Declaration declaration = new Declaration();
+                    declaration.field = "arg" + i++;
+                    declaration.type = GetDeclarationType(item);
+                    declarations.Add(declaration);
+                }
+                return GetSubObject(declarations);
+            }
+
+            /*
             //获取所有项的类型名称
             Type type = array[0].GetType();
             //对象
@@ -163,6 +189,7 @@ public class /*ClassName*/
             {
                 return type.ToString() + "[]";
             }
+             */
         }
 
         
@@ -182,13 +209,47 @@ public class /*ClassName*/
         }
 
         /// <summary>
+        /// 获取Object、Array 和 基础类型的声明字符
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        internal static string GetDeclarationType(object value)
+        {
+            Type type = value.GetType();
+            string typeStr = "";
+            //对象
+            if (type == typeof(Dictionary<string, object>))
+            {
+                string subObjName = GetSubObject((Dictionary<string, object>)value);
+                typeStr = subObjName;
+            }
+            //数组
+            else if (type.IsArray)
+            {
+                //检测是否需要添加子类
+                object[] array = (object[])value;
+                typeStr = DeclareArray(array);
+            }
+            else
+            {
+                //字符串、Number、Bool
+                typeStr = type.ToString();
+            }
+            return typeStr;
+        }
+
+        /// <summary>
         /// 获取/新建SubObject
         /// </summary>
         /// <returns></returns>
         internal static string GetSubObject(Dictionary<string, object> obj)
         {
             List<Declaration> declarations = DeclareObject(obj);//声明列表
+            return GetSubObject(declarations);
+        }
 
+        internal static string GetSubObject(List<Declaration> declarations)
+        {
             //和已有的子对象进行比对
             foreach (JSONSubObject subObj in subObjects)
             {

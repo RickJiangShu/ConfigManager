@@ -39,6 +39,9 @@
                 //添加子节点（如果多个同名子节点则是数组）
                 foreach (XmlNode childNode in node.ChildNodes)
                 {
+                    if (childNode.NodeType != XmlNodeType.Element)
+                        continue;
+
                     string childName = childNode.Name;
                     if (addedNodeNames.Contains(childName))
                         continue;

@@ -119,6 +119,7 @@ public class /*ClassName*/
             //判断是否需要创建Array类
             bool arrayClass = false;
             Type lt = null;
+            object li = null;
             foreach (object item in array)
             {
                 Type t = item.GetType();
@@ -127,16 +128,30 @@ public class /*ClassName*/
                     arrayClass = true;
                     break;
                 }
-                if (lt != null && lt != t)
+                if (lt != null)
                 {
-                    //数字类型不同不算
-                    if (!ConfigTools.IsNumber(lt) || !ConfigTools.IsNumber(t))
+                    //类型不同
+                    if (lt != t)
                     {
-                        arrayClass = true;
-                        break;
+                        //数字类型不同不算
+                        if (!ConfigTools.IsNumber(lt) || !ConfigTools.IsNumber(t))
+                        {
+                            arrayClass = true;
+                            break;
+                        }
+                    }
+                    //类型相同 && 都是Dictionary<string, object>
+                    else if(t == ConfigConstants.OBJECT_DICTIONARY_TYPE)
+                    {
+                        if (!ConfigTools.IsSameObjectDictionary((Dictionary<string, object>)li, (Dictionary<string, object>)item))
+                        {
+                            arrayClass = true;
+                            break;
+                        }
                     }
                 }
                 lt = t;
+                li = item;
             }
 
             //普通数组

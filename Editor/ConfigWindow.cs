@@ -243,7 +243,8 @@ namespace ConfigManagerEditor
 
                 switch(type)
                 {
-                    case SourceType.Sheet:
+                    case SourceType.Txt:
+                    case SourceType.Csv:
                         try
                         {
                             SheetSource source = SheetParser.Parse(content, file.Name);
@@ -254,15 +255,21 @@ namespace ConfigManagerEditor
                             UnityEngine.Debug.LogError(file.Name + "解析失败！请检查格式是否正确，如果格式正确请联系作者：https://github.com/RickJiangShu/ConfigManager/issues" + "\n" + e);
                         }
                         break;
-                    case SourceType.Struct:
+                    case SourceType.Json: 
                         try
                         {
-                            StructSource st;
-                            if (file.Extension == ".json")
-                                st = JsonParser.Parse(content, file.Name);
-                            else
-                                st = XmlParser.Parse(content, file.Name);
- 
+                            StructSource st= JsonParser.Parse(content, file.Name);
+                            structs.Add(st);
+                        }
+                        catch (Exception e)
+                        {
+                            UnityEngine.Debug.LogError(file.Name + "解析失败！请检查格式是否正确，如果格式正确请联系作者：https://github.com/RickJiangShu/ConfigManager/issues" + "\n" + e);
+                        }
+                        break;
+                    case SourceType.Xml:
+                        try
+                        {
+                            StructSource st = XmlParser.Parse(content, file.Name);
                             structs.Add(st);
                         }
                         catch (Exception e)
@@ -305,23 +312,26 @@ namespace ConfigManagerEditor
         /// <returns></returns>
         private bool TypeEnabled(string extension,out SourceType type)
         {
-            type = SourceType.Sheet;
             switch(extension)
             {
                 case ".txt":
+                    type = SourceType.Txt;
                     return cache.txtEnabled;
                 case ".csv":
+                    type = SourceType.Csv;
                     return cache.csvEnabled;
                 case ".json":
-                    type = SourceType.Struct;
+                    type = SourceType.Json;
                     return cache.jsonEnabled;
                 case ".xml":
-                    type = SourceType.Struct;
+                    type = SourceType.Xml;
                     return cache.xmlEnabled;
                 case ".xls":
                 case ".xlsx":
+                    type = SourceType.Xlsx;
                     return cache.xlEnabled;
             }
+            type = SourceType.Txt;
             return false;
         }
     }

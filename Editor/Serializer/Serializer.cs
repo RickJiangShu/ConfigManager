@@ -15,7 +15,7 @@ namespace ConfigManagerEditor
     /// </summary>
     public class Serializer
     {
-        public static object Serialize(List<SheetSource> sheets,List<StructSource> jsons)
+        public static object Serialize(List<SheetSource> sheets,List<StructSource> structs)
         {
             Type t = FindType("SerializableSet");
             if (t == null)
@@ -36,7 +36,7 @@ namespace ConfigManagerEditor
             }
 
             //Json
-            foreach (StructSource source in jsons)
+            foreach (StructSource source in structs)
             {
                 string fieldName = source.sourceName;
 

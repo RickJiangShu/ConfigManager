@@ -7,9 +7,12 @@
 namespace ConfigManagerEditor
 {
     using System;
-    using System.IO;
-    using System.Text;
-    using System.Text.RegularExpressions;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Text;
+using System.Text.RegularExpressions;
+
     /// <summary>
     /// 配置工具集
     /// </summary>
@@ -454,12 +457,12 @@ namespace ConfigManagerEditor
 
             //float
             float fNum;
-            if (float.TryParse(content, out fNum))
+            if (float.TryParse(content, ConfigConstants.NUMBER_STYPLES, CultureInfo.CurrentCulture, out fNum))
                 return fNum;
 
             //double
             double dNum;
-            if (double.TryParse(content, out dNum))
+            if (double.TryParse(content, ConfigConstants.NUMBER_STYPLES, CultureInfo.CurrentCulture, out dNum))
                 return dNum;
 
             return content;
@@ -483,8 +486,7 @@ namespace ConfigManagerEditor
         public static bool IsNumber(string content)
         {
             double retNum;
-
-            bool isNum = Double.TryParse(content, System.Globalization.NumberStyles.Any, System.Globalization.NumberFormatInfo.InvariantInfo, out retNum);
+            bool isNum = Double.TryParse(content, ConfigConstants.NUMBER_STYPLES, CultureInfo.CurrentCulture, out retNum);
             return isNum;
         }
 
@@ -517,6 +519,68 @@ namespace ConfigManagerEditor
         public static bool IsBool(string content)
         {
             return content == "true" || content == "false" || content == "null";
+        }
+
+        /// <summary>
+        /// ObjectDictionary是否相同
+        /// </summary>
+        /// <returns></returns>
+        public static bool IsSameObjectDictionary(Dictionary<string, object> a, Dictionary<string, object> b)
+        {
+            int al = a.Count;
+            int bl = b.Count;
+            if (al != bl)
+                return false;
+
+            foreach (string akey in a.Keys)
+            {
+                if (!b.ContainsKey(akey))
+                    return false;
+
+                if (!IsSameObject(a[akey], b[akey]))
+                    return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// 判断ObjectArray是否相等
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static bool IsSameObjectArray(object[] a, object[] b)
+        {
+            int al = a.Length;
+            int bl = b.Length;
+            if (al != bl)
+                return false;
+
+            for (int i = 0; i < al; i++)
+            {
+                if (!IsSameObject(a[i], b[i]))
+                    return false;
+            }
+
+            return true;
+        }
+
+        public static bool IsSameObject(object a, object b)
+        {
+            Type atype = a.GetType();
+            Type btype = b.GetType();
+            if (atype != btype)
+                return false;
+
+            if (atype == ConfigConstants.OBJECT_DICTIONARY_TYPE)
+            {
+                return IsSameObjectDictionary((Dictionary<string, object>)a, (Dictionary<string, object>)b);
+            }
+            else if (atype == ConfigConstants.OBJECT_ARRAY_TYPE)
+            {
+                return IsSameObjectArray((object[])a, (object[])b);
+            }
+            return true;
         }
         #endregion
     

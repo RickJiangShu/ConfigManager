@@ -19,12 +19,18 @@ namespace ConfigManagerEditor
         /// <summary>
         /// 行
         /// </summary>
-        public int row;
+        public int row
+        {
+            get { return matrix.GetLength(0); }
+        }
 
         /// <summary>
         /// 列
         /// </summary>
-        public int column;
+        public int column
+        {
+            get { return matrix.GetLength(1); }
+        }
     }
 }
 

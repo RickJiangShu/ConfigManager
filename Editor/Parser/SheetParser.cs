@@ -37,7 +37,7 @@ namespace ConfigManagerEditor
             ConvertOriginalType(matrix);
             string originalName = fileName.Substring(0, fileName.LastIndexOf('.'));
             string className = originalName + "Sheet";
-            return CreateSource(table, originalName, className, matrix, row, column);
+            return CreateSource(table, originalName, className, matrix);
         }
 
         /// <summary>
@@ -72,26 +72,22 @@ namespace ConfigManagerEditor
 
             string originalName = fileName.Substring(0, fileName.LastIndexOf('.'));
             string className = originalName + "Sheet";
-            int row;
-            int column;
-            string[,] matrix = Content2Matrix(content, sv, lf, out row, out column);
+            string[,] matrix = Content2Matrix(content, sv, lf);
 
             if (isCsv)
                 ClearCsvQuotation(matrix);
 
             ConvertOriginalType(matrix);
-            return CreateSource(content, originalName, className, matrix, row, column);
+            return CreateSource(content, originalName, className, matrix);
         }
 
-        private static SheetSource CreateSource(object original,string originalName,string className,string[,] matrix,int row,int column)
+        private static SheetSource CreateSource(object original,string originalName,string className,string[,] matrix)
         {
             SheetSource source = new SheetSource();
             source.original = original;
             source.originalName = originalName;//文件名
             source.className = className;//类名
             source.matrix = matrix;
-            source.row = row;
-            source.column = column;
             return source;
         }
 
@@ -102,7 +98,7 @@ namespace ConfigManagerEditor
         /// <param name="sv">分隔符 Separated Values</param>
         /// <param name="lf">换行符 Line Feed</param>
         /// <returns></returns>
-        private static string[,] Content2Matrix(string config, string sv, string lf, out int row, out int col)
+        private static string[,] Content2Matrix(string config, string sv, string lf)
         {
             config = config.Trim();//清空末尾的空白
 
@@ -110,8 +106,8 @@ namespace ConfigManagerEditor
             string[] lines = Regex.Split(config, lf);
             string[] firstLine = Regex.Split(lines[0], sv, RegexOptions.Compiled);
 
-            row = lines.Length;
-            col = firstLine.Length;
+            int row = lines.Length;
+            int col = firstLine.Length;
             string[,] matrix = new string[row, col];
             //为第一行赋值
             for (int i = 0, l = firstLine.Length; i < l; i++)

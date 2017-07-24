@@ -403,8 +403,8 @@ namespace ConfigManagerEditor
     [System.Serializable]
     public class Cache
     {
-        public string sourceFolder = "Assets/Config";
-        public string configOutputFolder = "Assets/Scripts/Config";
+        public string sourceFolder = "Assets";
+        public string configOutputFolder = "Assets/Output";
         public string assetOutputFolder = "Assets/Resources";
 
         public bool txtEnabled = true;

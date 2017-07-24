@@ -7,7 +7,7 @@
 namespace ConfigManagerEditor
 {
     /// <summary>
-    /// 表格（.txt .csv .xls .xlxs）
+    /// 表格（.txt .csv .xls .xlsx）
     /// </summary>
     public class SheetSource : Source
     {

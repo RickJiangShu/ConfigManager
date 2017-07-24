@@ -29,7 +29,7 @@ namespace ConfigManagerEditor
             //Config
             foreach (SheetSource source in sheets)
             {
-                string fieldName = source.sourceName + "s";
+                string fieldName = source.originalName + "s";
                 Array configs = Source2Configs(source);
                 FieldInfo fieldInfo = t.GetField(fieldName);
                 fieldInfo.SetValue(set,configs);
@@ -38,7 +38,7 @@ namespace ConfigManagerEditor
             //Json
             foreach (StructSource source in structs)
             {
-                string fieldName = source.sourceName;
+                string fieldName = source.originalName;
 
                 //使用 FromJson 获取json对象
                 Type jsonType = FindType(source.className);

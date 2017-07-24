@@ -6,15 +6,47 @@
  */
 namespace ConfigManagerEditor
 {
+    using Excel;
+    using System.Data;
     using System.Text.RegularExpressions;
     /// <summary>
     /// SheetParser
     /// </summary>
     public class SheetParser
     {
+
+        /// <summary>
+        /// Excel
+        /// </summary>
+        /// <param name="tabel"></param>
+        /// <returns></returns>
+        public static SheetSource Parse(DataTable table,string fileName)
+        {
+            int column = table.Columns.Count;
+            int row = table.Rows.Count;
+
+            string[,] matrix = new string[row, column];
+            for (int i = 0; i < row; i++)
+            {
+                for (int j = 0; j < column; j++)
+                {
+                    string value = table.Rows[i][j].ToString();
+                    matrix[i, j] = value;
+                }
+            }
+            string originalName = fileName.Substring(0, fileName.LastIndexOf('.'));
+            string className = originalName + "Sheet";
+            return CreateSource(table, originalName, className, matrix, row, column);
+        }
+
+        /// <summary>
+        /// 切割字符串（txt/csv）
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
         public static SheetSource Parse(string content,string fileName)
         {
-            SheetSource source = new SheetSource();
             string lf;
             string sv;
 
@@ -30,15 +62,26 @@ namespace ConfigManagerEditor
             else
                 sv = ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)";//Fork:https://stackoverflow.com/questions/6542996/how-to-split-csv-whose-columns-may-contain
 
+            string originalName = fileName.Substring(0, fileName.LastIndexOf('.'));
+            string className = originalName + "Sheet";
+            int row;
+            int column;
+            string[,] matrix = Content2Matrix(content, sv, lf, out row, out column);
+            return CreateSource(content, originalName, className, matrix, row, column);
+        }
 
-            //写入源
-            source.content = content;
-            source.sourceName = fileName.Substring(0,fileName.LastIndexOf('.')); ;//文件名
-            source.className = source.sourceName + "Config";//类名
-            source.matrix = Content2Matrix(source.content, sv, lf, out source.row, out source.column);
-           
+        private static SheetSource CreateSource(object original,string originalName,string className,string[,] matrix,int row,int column)
+        {
+            SheetSource source = new SheetSource();
+            source.original = original;
+            source.originalName = originalName;//文件名
+            source.className = className;//类名
+            source.matrix = matrix;
+            source.row = row;
+            source.column = column;
             return source;
         }
+
         /// <summary>
         /// 从配置转换成矩阵数组（0行1列）
         /// </summary>

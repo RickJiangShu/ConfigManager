@@ -43,9 +43,9 @@ namespace ConfigManagerEditor
         {
             StructSource source = new StructSource();
 
-            source.content = content;
-            source.sourceName = fileName.Substring(0, fileName.LastIndexOf('.')); ;//文件名
-            source.className = source.sourceName + "Json";//类名
+            source.original = content;
+            source.originalName = fileName.Substring(0, fileName.LastIndexOf('.')); ;//文件名
+            source.className = source.originalName + "Json";//类名
 
             source.obj = ParseRoot(content);
             return source;

@@ -12,6 +12,9 @@ namespace ConfigManagerEditor
     using System.IO;
     using System.Collections.Generic;
     using System.Text;
+    using Excel;
+    using System.Data;
+    using System.Text.RegularExpressions;
 
     /// <summary>
     /// ConfigManager窗口
@@ -62,7 +65,8 @@ namespace ConfigManagerEditor
             cache.csvEnabled = EditorGUILayout.Toggle("*.csv", cache.csvEnabled);
             cache.jsonEnabled = EditorGUILayout.Toggle("*.json", cache.jsonEnabled);
             cache.xmlEnabled = EditorGUILayout.Toggle("*.xml", cache.xmlEnabled);
-       //     cache.xlEnabled = EditorGUILayout.Toggle("*.xls & *.xlsx", cache.xlEnabled);
+            cache.xlsEnabled = EditorGUILayout.Toggle("*.xls", cache.xlsEnabled);
+            cache.xlsxEnabled = EditorGUILayout.Toggle("*.xlsx", cache.xlsxEnabled);
 
             //Operation
             EditorGUILayout.Space();
@@ -226,25 +230,44 @@ namespace ConfigManagerEditor
             for (int i = 0, l = files.Length; i < l; i++)
             {
                 FileInfo file = files[i];
-                SourceType type;
-                if (!TypeEnabled(file.Extension,out type))
+                if (IsTemporaryFile(file.Name))//临时文件
                     continue;
 
-                string content;
-                byte[] bytes;
-                ConfigTools.ReadFile(file.FullName, out bytes);
-                ConfigTools.DetectTextEncoding(bytes, out content);//转换不同的编码格式
+                OriginalType type;
+                if(!TypeEnabled(file.Extension,out type))
+                    continue;
 
-                if (string.IsNullOrEmpty(content))
+                DataTable excelData = null;
+                string content = "";
+
+                //读取Excel
+                if (type == OriginalType.Xls || type == OriginalType.Xlsx)
                 {
-                    Debug.LogWarning(file.Name + "内容为空！");
-                    continue;
+                    FileStream stream = File.Open(file.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                    IExcelDataReader excelReader = type == OriginalType.Xlsx ? ExcelReaderFactory.CreateOpenXmlReader(stream) : ExcelReaderFactory.CreateBinaryReader(stream);
+                    DataSet set = excelReader.AsDataSet();
+                    excelData = set.Tables[0];
                 }
+                //其他
+                else
+                {
+                    byte[] bytes;
+                    ConfigTools.ReadFile(file.FullName, out bytes);
+                    ConfigTools.DetectTextEncoding(bytes, out content);//转换不同的编码格式
+
+                    if (string.IsNullOrEmpty(content))
+                    {
+                        Debug.LogWarning(file.Name + "内容为空！");
+                        continue;
+                    }
+                }
+
+                
 
                 switch(type)
                 {
-                    case SourceType.Txt:
-                    case SourceType.Csv:
+                    case OriginalType.Txt:
+                    case OriginalType.Csv:
                         try
                         {
                             SheetSource source = SheetParser.Parse(content, file.Name);
@@ -255,7 +278,7 @@ namespace ConfigManagerEditor
                             UnityEngine.Debug.LogError(file.Name + "解析失败！请检查格式是否正确，如果格式正确请联系作者：https://github.com/RickJiangShu/ConfigManager/issues" + "\n" + e);
                         }
                         break;
-                    case SourceType.Json: 
+                    case OriginalType.Json: 
                         try
                         {
                             StructSource st= JsonParser.Parse(content, file.Name);
@@ -266,11 +289,23 @@ namespace ConfigManagerEditor
                             UnityEngine.Debug.LogError(file.Name + "解析失败！请检查格式是否正确，如果格式正确请联系作者：https://github.com/RickJiangShu/ConfigManager/issues" + "\n" + e);
                         }
                         break;
-                    case SourceType.Xml:
+                    case OriginalType.Xml:
                         try
                         {
                             StructSource st = XmlParser.Parse(content, file.Name);
                             structs.Add(st);
+                        }
+                        catch (Exception e)
+                        {
+                            UnityEngine.Debug.LogError(file.Name + "解析失败！请检查格式是否正确，如果格式正确请联系作者：https://github.com/RickJiangShu/ConfigManager/issues" + "\n" + e);
+                        }
+                        break;
+                    case OriginalType.Xls:
+                    case OriginalType.Xlsx:
+                        try
+                        {
+                            SheetSource st = SheetParser.Parse(excelData, file.Name);
+                            sheets.Add(st);
                         }
                         catch (Exception e)
                         {
@@ -310,29 +345,40 @@ namespace ConfigManagerEditor
         /// </summary>
         /// <param name="extension"></param>
         /// <returns></returns>
-        private bool TypeEnabled(string extension,out SourceType type)
+        private bool TypeEnabled(string extension,out OriginalType type)
         {
             switch(extension)
             {
                 case ".txt":
-                    type = SourceType.Txt;
+                    type = OriginalType.Txt;
                     return cache.txtEnabled;
                 case ".csv":
-                    type = SourceType.Csv;
+                    type = OriginalType.Csv;
                     return cache.csvEnabled;
                 case ".json":
-                    type = SourceType.Json;
+                    type = OriginalType.Json;
                     return cache.jsonEnabled;
                 case ".xml":
-                    type = SourceType.Xml;
+                    type = OriginalType.Xml;
                     return cache.xmlEnabled;
                 case ".xls":
+                    type = OriginalType.Xls;
+                    return cache.xlsEnabled;
                 case ".xlsx":
-                    type = SourceType.Xlsx;
-                    return cache.xlEnabled;
+                    type = OriginalType.Xlsx;
+                    return cache.xlsxEnabled;
             }
-            type = SourceType.Txt;
+            type = OriginalType.Txt;
             return false;
+        }
+
+        /// <summary>
+        /// like ~$Equip
+        /// </summary>
+        /// <returns></returns>
+        private bool IsTemporaryFile(string fileName)
+        {
+            return Regex.Match(fileName, @"^\~\$").Success;
         }
     }
 
@@ -347,7 +393,8 @@ namespace ConfigManagerEditor
         public bool csvEnabled = true;
         public bool jsonEnabled = true;
         public bool xmlEnabled = true;
-        public bool xlEnabled = true;//*.xls & *.xlsx
+        public bool xlsEnabled = true;
+        public bool xlsxEnabled = true;
 
         public string serializerOutputFolder { get { return configOutputFolder + "/Serializer"; } }
     }

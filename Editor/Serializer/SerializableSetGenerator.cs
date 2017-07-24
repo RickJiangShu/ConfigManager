@@ -39,7 +39,7 @@ public class SerializableSet : UnityEngine.ScriptableObject
             {
                 string declaration = template2;
                 declaration = declaration.Replace("/*ConfigName*/", sheet.className);
-                declaration = declaration.Replace("/*SourceName*/", sheet.sourceName);
+                declaration = declaration.Replace("/*SourceName*/", sheet.originalName);
                 configDeclarations += declaration;
             }
             content = content.Replace("/*ConfigDeclarations*/", configDeclarations);
@@ -50,7 +50,7 @@ public class SerializableSet : UnityEngine.ScriptableObject
             {
                 string declaration = template3;
                 declaration = declaration.Replace("/*JsonName*/", json.className);
-                declaration = declaration.Replace("/*SourceName*/", json.sourceName);
+                declaration = declaration.Replace("/*SourceName*/", json.originalName);
                 jsonDeclarations += declaration;
             }
             content = content.Replace("/*JsonDeclarations*/", jsonDeclarations);

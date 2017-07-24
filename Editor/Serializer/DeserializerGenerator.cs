@@ -50,7 +50,7 @@ namespace ConfigManagerEditor
                 string setScript = template2;
 
                 setScript = setScript.Replace("/*ConfigName*/", sheet.className);
-                setScript = setScript.Replace("/*SourceName*/", sheet.sourceName);
+                setScript = setScript.Replace("/*SourceName*/", sheet.originalName);
                 setScript = setScript.Replace("/*IDField*/", idField);
 
                 setDictionaries += setScript;
@@ -62,7 +62,7 @@ namespace ConfigManagerEditor
             {
                 string setScript = template3;
                 setScript = setScript.Replace("/*ClassName*/", json.className);
-                setScript = setScript.Replace("/*SourceName*/", json.sourceName);
+                setScript = setScript.Replace("/*SourceName*/", json.originalName);
 
                 setJsons += setScript;
             }

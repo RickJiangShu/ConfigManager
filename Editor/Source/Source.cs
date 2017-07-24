@@ -12,14 +12,14 @@ namespace ConfigManagerEditor
     public class Source
     {
         /// <summary>
-        /// 内容
+        /// 原始内容(string/DataTable)
         /// </summary>
-        public string content;
+        public object original;
 
         /// <summary>
         /// 源文件的文件名
         /// </summary>
-        public string sourceName;
+        public string originalName;
 
         /// <summary>
         /// 类名
@@ -27,14 +27,27 @@ namespace ConfigManagerEditor
         public string className;
     }
 
-    public enum SourceType
+    /// <summary>
+    /// 原始文件类型
+    /// </summary>
+    public enum OriginalType
     {
         Txt,
         Csv,
         Json,
         Xml,
+        Xls,
         Xlsx,
      //   Sheet,//表格型数据 txt csv
      //   Struct,//结构型数据 json xml
+    }
+
+    /// <summary>
+    /// 源类型
+    /// </summary>
+    public enum SourceType
+    {
+        Sheet,//表格
+        Struct,//结构
     }
 }

@@ -10,9 +10,9 @@
         {
             StructSource source = new StructSource();
 
-            source.content = content;
-            source.sourceName = fileName.Substring(0, fileName.LastIndexOf('.')); ;//文件名
-            source.className = source.sourceName + "Xml";//类名
+            source.original = content;
+            source.originalName = fileName.Substring(0, fileName.LastIndexOf('.')); ;//文件名
+            source.className = source.originalName + "Xml";//类名
 
             XmlDocument document = new XmlDocument();
             document.LoadXml(content);

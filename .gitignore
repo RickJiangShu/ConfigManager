@@ -1,5 +1,5 @@
 #Unity缓存文件夹
-Library/
+./Library/
 Temp/
 
 #发布文件夹

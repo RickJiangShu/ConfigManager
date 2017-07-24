@@ -20,9 +20,12 @@ namespace ConfigManagerEditor
 @"[System.Serializable]
 public class /*ClassName*/
 {
-    public static /*ClassName*/ ins;
-
 /*Declarations*/
+    public static /*ClassName*/ instance;
+    public static /*ClassName*/ Get()
+    {
+        return instance;
+    }
 }";
 
         private static string tempDeclaration =
@@ -38,7 +41,6 @@ public class /*ClassName*/
 }
 ";
 
-        
         //decalration
 
         internal static List<StructSubObject> subObjects;

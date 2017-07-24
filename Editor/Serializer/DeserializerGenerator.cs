@@ -34,7 +34,7 @@ namespace ConfigManagerEditor
         }
 ";
         private const string template3 =
-@"        /*ClassName*/.ins = set./*SourceName*/;
+@"        /*ClassName*/.instance = set./*SourceName*/;
 ";
 
         public static void Generate(List<SheetSource> sheets,List<StructSource> jsons,string outputFolder)

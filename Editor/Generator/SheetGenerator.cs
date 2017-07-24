@@ -43,30 +43,6 @@ public class /*ClassName*/
     {
         return dictionary;
     }
-
-    /// <summary>
-    /// 获取所有键
-    /// </summary>
-    /// <returns>所有键</returns>
-    public static /*IDType*/[] GetKeys()
-    {
-        int count = dictionary.Keys.Count;
-        /*IDType*/[] keys = new /*IDType*/[count];
-        dictionary.Keys.CopyTo(keys,0);
-        return keys;
-    }
-
-    /// <summary>
-    /// 获取所有实例
-    /// </summary>
-    /// <returns>所有实例</returns>
-    public static /*ClassName*/[] GetValues()
-    {
-        int count = dictionary.Values.Count;
-        /*ClassName*/[] values = new /*ClassName*/[count];
-        dictionary.Values.CopyTo(values, 0);
-        return values;
-    }
 }
 ";
         private static string templete2 =

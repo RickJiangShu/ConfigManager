@@ -59,7 +59,7 @@ namespace ConfigManagerEditor
 
             //Source Type
             EditorGUILayout.Space();
-            GUILayout.Label("Source Type", EditorStyles.boldLabel);
+            GUILayout.Label("Original Type", EditorStyles.boldLabel);
 
             cache.txtEnabled = EditorGUILayout.Toggle("*.txt", cache.txtEnabled);
             cache.csvEnabled = EditorGUILayout.Toggle("*.csv", cache.csvEnabled);
@@ -247,6 +247,7 @@ namespace ConfigManagerEditor
                     IExcelDataReader excelReader = type == OriginalType.Xlsx ? ExcelReaderFactory.CreateOpenXmlReader(stream) : ExcelReaderFactory.CreateBinaryReader(stream);
                     DataSet set = excelReader.AsDataSet();
                     excelData = set.Tables[0];
+                    stream.Close();
                 }
                 //其他
                 else

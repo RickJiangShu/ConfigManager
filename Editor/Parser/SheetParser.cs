@@ -34,6 +34,7 @@ namespace ConfigManagerEditor
                     matrix[i, j] = value;
                 }
             }
+            ConvertOriginalType(matrix);
             string originalName = fileName.Substring(0, fileName.LastIndexOf('.'));
             string className = originalName + "Sheet";
             return CreateSource(table, originalName, className, matrix, row, column);
@@ -49,6 +50,7 @@ namespace ConfigManagerEditor
         {
             string lf;
             string sv;
+            bool isCsv;
 
             //判断换行符
             if (content.IndexOf("\r\n") != -1)
@@ -58,15 +60,26 @@ namespace ConfigManagerEditor
 
             //判断分割符
             if (content.IndexOf("\t") != -1)
+            {
                 sv = "\t";
+                isCsv = false;
+            }
             else
+            {
                 sv = ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)";//Fork:https://stackoverflow.com/questions/6542996/how-to-split-csv-whose-columns-may-contain
+                isCsv = true;
+            }
 
             string originalName = fileName.Substring(0, fileName.LastIndexOf('.'));
             string className = originalName + "Sheet";
             int row;
             int column;
             string[,] matrix = Content2Matrix(content, sv, lf, out row, out column);
+
+            if (isCsv)
+                ClearCsvQuotation(matrix);
+
+            ConvertOriginalType(matrix);
             return CreateSource(content, originalName, className, matrix, row, column);
         }
 
@@ -115,6 +128,44 @@ namespace ConfigManagerEditor
                 }
             }
             return matrix;
+        }
+
+        /// <summary>
+        /// 转换原始配置配型 -> CShartType
+        /// </summary>
+        private static void ConvertOriginalType(string[,] matrix)
+        {
+            int column = matrix.GetLength(1);
+            for (int x = 0; x < column; x++)
+            {
+                matrix[1, x] = ConfigTools.SourceType2CSharpType(x, matrix);
+            }
+        }
+
+        /// <summary>
+        /// 去除CSV引号
+        /// </summary>
+        /// <param name="matrix"></param>
+        private static void ClearCsvQuotation(string[,] matrix)
+        {
+            int row = matrix.GetLength(0);
+            int column = matrix.GetLength(1);
+            for (int y = 0; y < row; y++)
+            {
+                for (int x = 0; x < column; x++)
+                {
+                    string v = matrix[y, x];
+                    if (string.IsNullOrEmpty(v) || v.Length < 2)
+                        continue;
+
+                    if (v[0] == '"')
+                    {
+                        v = v.Remove(0, 1);
+                        v = v.Remove(v.Length - 1, 1);
+                        matrix[y, x] = v;
+                    }
+                }
+            }
         }
     }
 }

@@ -44,14 +44,27 @@ namespace ConfigManagerEditor
         /// </summary>
         /// <param name="str"></param>
         /// <returns></returns>
-        public static string SourceType2CSharpType(string sourceType)
+        public static string SourceType2CSharpType(int column ,string[,] matrix)
         {
-            string sourceBType;
-            if (IsArrayType(sourceType, out sourceBType))
+            string sourceType = matrix[1, column];
+
+            if (string.IsNullOrEmpty(sourceType) || sourceType == "*")
             {
-                return sourceBType + "[]";
+                return Smart2CSharpType(column, matrix);
             }
-            return SourceBaseType2CSharpBaseType(sourceType);
+            else if (sourceType == "*[]")
+            {
+                return Smart2CSharpArrayType(column, matrix);
+            }
+            else
+            {
+                string sourceBaseType;
+                if (IsArrayType(sourceType, out sourceBaseType))
+                {
+                    return sourceBaseType + "[]";
+                }
+                return SourceBaseType2CSharpBaseType(sourceType);
+            }
         }
 
         /// <summary>
@@ -116,7 +129,74 @@ namespace ConfigManagerEditor
         }
         #endregion
 
-        #region 将SourceType转换为SystemType
+        #region 智能判断CSharp类型
+        private static string Smart2CSharpType(int column, string[,] matrix)
+        {
+            int row = matrix.GetLength(0);
+            string valid = FindValidValue(column, matrix);
+
+            if (IsNumber(valid))
+            {
+                string[] numbersOfColumn = new string[row - 3];//这行所有的Number
+                for(int y = 3,i = 0;y<row;y++,i++)
+                    numbersOfColumn[i] = matrix[y,column];
+
+                Type minimalType = FindMinimalNumberType(numbersOfColumn);//最小的数字类型
+                return Type2SourceBaseType(minimalType);
+            }
+            else if (IsBool(valid))
+            {
+                return Type2SourceBaseType(typeof(bool));
+            }
+            else
+            {
+                return "string";
+            }
+        }
+        private static string Smart2CSharpArrayType(int column, string[,] matrix)
+        {
+            int row = matrix.GetLength(0);
+            string valid = FindValidValue(column, matrix);
+
+            string[] validArray = valid.Split(',');
+            if (IsNumber(validArray[0]))
+            {
+                List<object> numbersOfColumn = new List<object>();//不仅要遍历行，还要遍历数组中的值
+                for (int y = 3, i = 0; y < row; y++, i++)
+                {
+                    string rowData = matrix[y, column];
+                    if (string.IsNullOrEmpty(rowData))
+                        continue;
+
+                    numbersOfColumn.AddRange(rowData.Split(','));
+                }
+
+                Type minimalType = FindMinimalNumberType(numbersOfColumn);
+                return Type2SourceBaseType(minimalType) + "[]";
+            }
+            else if (IsBool(validArray[0]))
+            {
+                return Type2SourceBaseType(typeof(bool)) + "[]";
+            }
+            else
+                return "string[]";
+        }
+
+        private static string FindValidValue(int column, string[,] matrix)
+        {
+            string valid = "";
+            int row = matrix.GetLength(0);//行总数
+            for (int y = 3; y < row; y++)
+            {
+                valid = matrix[y, column];
+                if (!string.IsNullOrEmpty(valid))
+                    break;
+            }
+            return valid;
+        }
+        #endregion
+
+        #region 将SourceType <-> SystemType
         private static Type SourceBaseType2Type(string sourceBaseType)
         {
             string csharpBaseType = SourceBaseType2CSharpBaseType(sourceBaseType);
@@ -149,6 +229,35 @@ namespace ConfigManagerEditor
                 default:
                     return null;
             }
+        }
+        private static string Type2SourceBaseType(Type type)
+        {
+            if (type == typeof(bool))
+                return "bool";
+            else if (type == typeof(byte))
+                return "byte";
+            else if (type == typeof(ushort))
+                return "ushort";
+            else if (type == typeof(uint))
+                return "uint";
+            else if (type == typeof(sbyte))
+                return "sbyte";
+            else if (type == typeof(short))
+                return "short";
+            else if (type == typeof(int))
+                return "int";
+            else if (type == typeof(long))
+                return "long";
+            else if (type == typeof(ulong))
+                return "ulong";
+            else if (type == typeof(float))
+                return "float";
+            else if (type == typeof(double))
+                return "double";
+            else if (type == typeof(string))
+                return "string";
+
+            return "";
         }
         #endregion
 
@@ -201,12 +310,6 @@ namespace ConfigManagerEditor
                 case "double":
                     return double.Parse(sourceValue);
                 case "string":
-                    //去除CSV的""
-                    if (!string.IsNullOrEmpty(sourceValue) && sourceValue[0] == '"')
-                    {
-                        sourceValue = sourceValue.Remove(0, 1);
-                        sourceValue = sourceValue.Remove(sourceValue.Length - 1, 1);
-                    }
                     return sourceValue;
                 default:
                     return sourceValue;
@@ -225,16 +328,6 @@ namespace ConfigManagerEditor
             //解析数组
             if (string.IsNullOrEmpty(sourceValue) || sourceValue == "0") return null;
 
-            //去除CSV的""
-            if (sourceValue[0] == '"')
-            {
-                if (sourceValue.Length <= 2)
-                    return null;
-
-                sourceValue = sourceValue.Remove(0, 1);
-                sourceValue = sourceValue.Remove(sourceValue.Length - 1, 1);
-            }
-
             string[] values = sourceValue.Split(',');
             Type type = SourceBaseType2Type(sourceBaseType);
             Array array = Array.CreateInstance(type,values.Length);
@@ -246,10 +339,6 @@ namespace ConfigManagerEditor
             return array;
         }
         #endregion
-
-
-        
-
 
         /// <summary>
         /// 写入文件
@@ -472,7 +561,7 @@ namespace ConfigManagerEditor
         /// <returns></returns>
         public static bool ConvertBool(string content)
         {
-            return content == "true";
+            return content == "true" || content == "True" || content == "TRUE";
         }
         #endregion
 
@@ -517,7 +606,7 @@ namespace ConfigManagerEditor
         /// <returns></returns>
         public static bool IsBool(string content)
         {
-            return content == "true" || content == "false" || content == "null";
+            return content == "true" || content == "false" || content == "True" || content == "False" || content == "TRUE" || content == "FALSE";
         }
 
         /// <summary>
@@ -587,7 +676,7 @@ namespace ConfigManagerEditor
         /// 在数组中找到最小的数字类型
         /// </summary>
         /// <returns></returns>
-        public static Type FindMinimalNumberType(object[] array)
+        public static Type FindMinimalNumberType(IEnumerable<object> array)
         {
             if (FindParseSuccess<byte>(array, byte.TryParse))
                 return typeof(byte);
@@ -614,7 +703,7 @@ namespace ConfigManagerEditor
         }
 
         public delegate bool TryParseHandler<T>(string value, out T result);
-        public static bool FindParseSuccess<T>(object[] array,TryParseHandler<T> tryParse)
+        public static bool FindParseSuccess<T>(IEnumerable<object> array, TryParseHandler<T> tryParse)
         {
             foreach (object item in array)
             {

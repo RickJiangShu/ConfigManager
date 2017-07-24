@@ -43,8 +43,8 @@ public class /*ClassName*/
 
         //decalration
 
-        internal static List<StructSubObject> subObjects;
-        internal static uint subID;
+        private static List<StructSubObject> subObjects;
+        private static uint subID;
 
         public static void Generate(List<StructSource> structs, string outputFolder)
         {
@@ -93,7 +93,7 @@ public class /*ClassName*/
         /// <summary>
         /// 声明对象
         /// </summary>
-        internal static List<Declaration> DeclareObject(Dictionary<string, object> obj)
+        private static List<Declaration> DeclareObject(Dictionary<string, object> obj)
         {
             List<Declaration> declarations = new List<Declaration>();
 
@@ -116,7 +116,7 @@ public class /*ClassName*/
         /// 检测数组中是否含有子对象
         /// </summary>
         /// <param name="array"></param>
-        internal static string DeclareArray(object[] array)
+        private static string DeclareArray(object[] array)
         {
             //判断是否需要创建Array类
             bool arrayClass = false;
@@ -215,7 +215,7 @@ public class /*ClassName*/
         /// </summary>
         /// <param name="declarations"></param>
         /// <returns></returns>
-        internal static string CombineDeclarations(List<Declaration> declarations)
+        private static string CombineDeclarations(List<Declaration> declarations)
         {
             string declarationsStr = "";
             foreach (Declaration declaration in declarations)
@@ -230,7 +230,7 @@ public class /*ClassName*/
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        internal static string GetDeclarationType(object value)
+        private static string GetDeclarationType(object value)
         {
             Type type = value.GetType();
             string typeStr = "";
@@ -259,13 +259,13 @@ public class /*ClassName*/
         /// 获取/新建SubObject
         /// </summary>
         /// <returns></returns>
-        internal static string GetSubObject(Dictionary<string, object> obj)
+        private static string GetSubObject(Dictionary<string, object> obj)
         {
             List<Declaration> declarations = DeclareObject(obj);//声明列表
             return GetSubObject(declarations);
         }
 
-        internal static string GetSubObject(List<Declaration> declarations)
+        private static string GetSubObject(List<Declaration> declarations)
         {
             //和已有的子对象进行比对
             foreach (StructSubObject subObj in subObjects)
@@ -288,7 +288,7 @@ public class /*ClassName*/
         /// <summary>
         /// JsonObject 子对象
         /// </summary>
-        internal class StructSubObject
+        private class StructSubObject
         {
             public uint id;
             public string name;
@@ -328,7 +328,7 @@ public class /*ClassName*/
         /// <summary>
         /// 声明
         /// </summary>
-        internal class Declaration
+        private class Declaration
         {
             public string type;
             public string field;

@@ -26,6 +26,8 @@ namespace ConfigManagerEditor
 
         private static bool justRecompiled;
 
+        public static event Action serializeCompleted;//序列化完成
+
         static ConfigWindow()
         {
             justRecompiled = true;
@@ -72,6 +74,12 @@ namespace ConfigManagerEditor
             EditorGUILayout.Space();
             GUILayout.Label("Operation", EditorStyles.boldLabel);
 
+
+            if (GUILayout.Button("Serialize"))
+            {
+                Serialize();
+            }
+
             if (GUILayout.Button("Clear Output"))
             {
                 if (EditorUtility.DisplayDialog("Clear Output",
@@ -80,7 +88,6 @@ namespace ConfigManagerEditor
                 {
                     ClearOutput();
                 }
-
             }
 
             if (GUILayout.Button("Output"))
@@ -222,7 +229,6 @@ namespace ConfigManagerEditor
             DirectoryInfo directory = new DirectoryInfo(cache.sourceFolder);
             FileInfo[] files = directory.GetFiles("*.*", SearchOption.AllDirectories);
 
-
             //源
             sheets = new List<SheetSource>();
             structs = new List<StructSource>();
@@ -262,8 +268,6 @@ namespace ConfigManagerEditor
                         continue;
                     }
                 }
-
-                
 
                 switch(type)
                 {
@@ -336,9 +340,22 @@ namespace ConfigManagerEditor
             //通过反射序列化
             UnityEngine.Object set = (UnityEngine.Object)Serializer.Serialize(sheets, structs);
             string o = cache.assetOutputFolder + "/" + assetName;
-            AssetDatabase.CreateAsset(set, o);
+
+            if (File.Exists(o))
+            {
+                UnityEngine.Object old = AssetDatabase.LoadMainAssetAtPath(o);
+                EditorUtility.CopySerialized(set, old);
+            }
+            else
+            {
+                AssetDatabase.CreateAsset(set, o);
+            }
 
             Debug.Log("序列化完成！");
+
+            if (serializeCompleted != null)
+                serializeCompleted();
+
         }
 
         /// <summary>

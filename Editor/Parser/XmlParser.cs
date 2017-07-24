@@ -1,4 +1,10 @@
-﻿namespace ConfigManagerEditor
+﻿/*
+ * Author:  Rick
+ * Create:  2017/7/18 13:40:02
+ * Email:   rickjiangshu@gmail.com
+ * Follow:  https://github.com/RickJiangShu
+ */
+namespace ConfigManagerEditor
 {
     using System.Collections;
     using System.Xml;
@@ -78,7 +84,7 @@
         /// </summary>
         /// <param name="node"></param>
         /// <returns></returns>
-        internal static bool IsObject(XmlNode node)
+        private static bool IsObject(XmlNode node)
         {
             if (node.Attributes != null && node.Attributes.Count > 0)
                 return true;

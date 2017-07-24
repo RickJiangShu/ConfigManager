@@ -7,11 +7,11 @@
 namespace ConfigManagerEditor
 {
     using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Text;
-using System.Text.RegularExpressions;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using System.IO;
+    using System.Text;
+    using System.Text.RegularExpressions;
 
     /// <summary>
     /// 配置工具集
@@ -381,7 +381,6 @@ using System.Text.RegularExpressions;
                     catch { break; }    // If C# doesn't recognize the name of the encoding, break.
                 }
             }
-
 
             // If all else fails, the encoding is probably (though certainly not
             // definitely) the user's local codepage! One might present to the user a

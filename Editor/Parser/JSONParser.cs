@@ -17,26 +17,26 @@ namespace ConfigManagerEditor
     {
         #region 正则表达式
         //解析键值对
-        internal const string regexPairOf = @"\s*" + regexString + @"\s*:\s*";//\s*"([^"]*)"\s*:\s*
+        private const string regexPairOf = @"\s*" + regexString + @"\s*:\s*";//\s*"([^"]*)"\s*:\s*
 
-        internal const string regexPairOfObject = regexPairOf + regexObject;
-        internal const string regexPairOfArray = regexPairOf + regexArray;
-        internal const string regexPairOfString = regexPairOf + regexString;
-        internal const string regexPairOfNumber = regexPairOf + regexNumber;
-        internal const string regexPairOfBool = regexPairOf + regexBool;
+        private const string regexPairOfObject = regexPairOf + regexObject;
+        private const string regexPairOfArray = regexPairOf + regexArray;
+        private const string regexPairOfString = regexPairOf + regexString;
+        private const string regexPairOfNumber = regexPairOf + regexNumber;
+        private const string regexPairOfBool = regexPairOf + regexBool;
 
 
         //对象
-        //internal const string regexObject = @"\{((?>\{(?<c>)|[^\{\}]+|\}(?<-c>))*(?(c)(?!)))\}";//Fork：https://stackoverflow.com/questions/546433/regular-expression-to-match-outer-brackets
-        internal const string regexObject = @"(?<!\[[\s\S]*)\{((?>\{(?<c>)|[^\{\}]+|\}(?<-c>))*(?(c)(?!)))\}";//前面不含[的{}
+        //private const string regexObject = @"\{((?>\{(?<c>)|[^\{\}]+|\}(?<-c>))*(?(c)(?!)))\}";//Fork：https://stackoverflow.com/questions/546433/regular-expression-to-match-outer-brackets
+        private const string regexObject = @"(?<!\[[\s\S]*)\{((?>\{(?<c>)|[^\{\}]+|\}(?<-c>))*(?(c)(?!)))\}";//前面不含[的{}
 
         //数组
-        internal const string regexArray = @"\[((?>\[(?<c>)|[^\[\]]+|\](?<-c>))*(?(c)(?!)))\]";
+        private const string regexArray = @"\[((?>\[(?<c>)|[^\[\]]+|\](?<-c>))*(?(c)(?!)))\]";
 
         //基础类型
-        internal const string regexString = "\"([^\"]*)\"";//"[^"]*"
-        internal const string regexNumber = @"(-?(?=[1-9]|0(?!\d))\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)";
-        internal const string regexBool = "(true|false|null)";
+        private const string regexString = "\"([^\"]*)\"";//"[^"]*"
+        private const string regexNumber = @"(-?(?=[1-9]|0(?!\d))\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)";
+        private const string regexBool = "(true|false|null)";
         #endregion
 
         public static StructSource Parse(string content,string fileName)
@@ -56,7 +56,7 @@ namespace ConfigManagerEditor
         /// </summary>
         /// <param name="json"></param>
         /// <returns></returns>
-        internal static Dictionary<string, object> ParseRoot(string json)
+        private static Dictionary<string, object> ParseRoot(string json)
         {
             Match match = Regex.Match(json, regexObject);
             if (match.Success)
@@ -71,7 +71,7 @@ namespace ConfigManagerEditor
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
-        internal static Dictionary<string, object> ParseObject(ref string content)
+        private static Dictionary<string, object> ParseObject(ref string content)
         {
             //解析members
             Pair[] members = ParseMembers(ref content);
@@ -93,7 +93,7 @@ namespace ConfigManagerEditor
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
-        internal static Pair[] ParseMembers(ref string content)
+        private static Pair[] ParseMembers(ref string content)
         {
             List<Pair> membersList = new List<Pair>();
 
@@ -155,7 +155,7 @@ namespace ConfigManagerEditor
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
-        internal static object[] ParseArray(ref string content)
+        private static object[] ParseArray(ref string content)
         {
             List<object> array = new List<object>();
 
@@ -218,7 +218,7 @@ namespace ConfigManagerEditor
         /// 解析键值对基础（解析出key 和 content）
         /// </summary>
         /// <returns></returns>
-        internal static Pair[] ParsePairs(ref string content, string regex)
+        private static Pair[] ParsePairs(ref string content, string regex)
         {
             MatchCollection matches = MatchesAndRemove(ref content, regex);
             int count = matches.Count;
@@ -237,7 +237,7 @@ namespace ConfigManagerEditor
         /// 匹配并删除字段
         /// </summary>
         /// <returns></returns>
-        internal static MatchCollection MatchesAndRemove(ref string content, string regex)
+        private static MatchCollection MatchesAndRemove(ref string content, string regex)
         {
             MatchCollection matches = Regex.Matches(content, regex);
             int count = matches.Count;
@@ -254,7 +254,7 @@ namespace ConfigManagerEditor
         /// <summary>
         /// 键值对
         /// </summary>
-        internal class Pair
+        private class Pair
         {
             public string key;//键
             public string content;//转换之前的文本
@@ -280,7 +280,7 @@ namespace ConfigManagerEditor
         /// <summary>
         /// 用来排序正则取到的字符
         /// </summary>
-        internal class Sort
+        private class Sort
         {
             public int index;
             public object data;

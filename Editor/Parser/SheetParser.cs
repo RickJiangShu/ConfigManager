@@ -89,7 +89,7 @@ namespace ConfigManagerEditor
         /// <param name="sv">分隔符 Separated Values</param>
         /// <param name="lf">换行符 Line Feed</param>
         /// <returns></returns>
-        internal static string[,] Content2Matrix(string config, string sv, string lf, out int row, out int col)
+        private static string[,] Content2Matrix(string config, string sv, string lf, out int row, out int col)
         {
             config = config.Trim();//清空末尾的空白
 

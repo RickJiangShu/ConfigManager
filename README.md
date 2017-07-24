@@ -104,3 +104,4 @@ bundle.Unload(true);//AssetBundle卸载内存
 2. k1104480005 提供希望支持Get所有数据的方法
 3. fuliufuliu 希望直接解析xls和xlsx文件
 4. zhengyiunity MAC电脑上解析时，注释部分中文乱码。
+5. takaaptech 让我意识到不要覆盖AssetBundleName和提供打包回调接口

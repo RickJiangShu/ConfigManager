@@ -1,7 +1,6 @@
-# 性能最高、最简单的配置管理工具
 ![logo](https://raw.githubusercontent.com/RickJiangShu/ConfigManager-Example/master/Poster/Logo.jpg "logo")
 
-**本工具优势**
+# 本工具优势
 1. **光速解析**：解析完全放在编辑模式下完成，运行时只需加载序列化文件即可。
 2. **支持任意格式**：txt、csv、json、xml、xls、xlsx等等。
 3. **无体积**：无运行时脚本，完全不占发行包体积。

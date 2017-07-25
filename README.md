@@ -45,7 +45,7 @@ https://github.com/RickJiangShu/ConfigManager-Example
 
 # 贡献者名单
 如果你有任何Bug、问题和意见请在Issues或[蛮牛](http://www.manew.com/thread-105598-1-1.html "一键读取Txt、Excel等表格配置【源码+原理】")里提出来，有时间一定立马回复，意见一经采纳就被列入“贡献者名单”。
-1. LiGo 提供希望支持cvs的建议
+1. LiGo 提供希望支持csv的建议
 2. k1104480005 提供希望支持Get所有数据的方法
 3. fuliufuliu 希望直接解析xls和xlsx文件
 4. zhengyiunity MAC电脑上解析时，注释部分中文乱码。

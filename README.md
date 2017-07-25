@@ -8,6 +8,12 @@
 5. **防止出错**："."操作符索引数据，编译器自动检查。
 
 # 快速使用
+### 写配置
+![](https://raw.githubusercontent.com/RickJiangShu/ConfigManager-Example/master/Poster/p3.jpg "")<br>
+[表格配置说明](https://github.com/RickJiangShu/ConfigManager-Example/blob/master/Doc/Sheet.md "表格配置说明")
+[Json配置说明](https://github.com/RickJiangShu/ConfigManager-Example/blob/master/Doc/Json.md "Json配置说明")
+[Xml配置说明](https://github.com/RickJiangShu/ConfigManager-Example/blob/master/Doc/Xml.md "Xml配置说明")
+
 ### 编辑器：
 1. 点击菜单栏"Window/Config Manager"；
 2. 设置对应的输入/输出路径；
@@ -34,45 +40,8 @@ print(monsterSheet.name);
 
 ![](https://raw.githubusercontent.com/RickJiangShu/ConfigManager-Example/master/Poster/p7.jpg "")
 
-## 范例
+### 范例
 https://github.com/RickJiangShu/ConfigManager-Example
-
-# 表格格式
-以列为属性，以行为一项；<br>
-第1行为**注释**；<br>
-第2行为**数据类型**<br>
-第3行为**字段标识符**<br>
-第4行及以下为各项配置<br>
-![](https://raw.githubusercontent.com/RickJiangShu/ConfigManager-Example/master/Poster/p3.jpg "")<br>
-<br>
-
-# 支持的数据类型
-| 配置类型 | 对应C#类型  | 取值范围 |
-| :------------: |:---------------:| :-----:|
-|bool|bool|0、false、False、False 都为否，其他为是|
-|byte、uint8|byte|0 ~ 255|
-|ushort、uint16|ushort|0 ~ 65,535|
-|uint、uint32|uint|0 ~ 4,294,967,295|
-|ulong、uint64|ulong|0 ~ 18,446,744,073,709,551,615|
-|sbyte、int8|sbyte|-128 ~ 127|
-|short、int16|short|-32,768 ~ 32,767|
-|int、int32|int|-2,147,483,648 ~ 2,147,483,647|
-|long、int64|long|-9,223,372,036,854,775,808 ~ 9,223,372,036,854,775,807|
-|float|float|-3.4 × 10^38 ~ +3.4 × 10^38|
-|double|double|±5.0 × 10^−324 ~ ±1.7 × 10^308|
-|string|string|Any|
-
-并支持以上基础类型的所有**数组类型**。<br>
-例如：字符串数组类型是string[]，值是Hello,World<br>
-
-# 优化建议
-1. 在Deserialize之后，把加载的序列化数据卸载掉。
-```
-Resources.UnloadUnusedAssets();//Resources卸载内存
-
-bundle.Unload(true);//AssetBundle卸载内存
-```
-2. 注意GetKeys()、GetValues()是Copy一个数组出来，所以做好缓存的工作。
 
 # 贡献者名单
 如果你有任何Bug、问题和意见请在Issues或[蛮牛](http://www.manew.com/thread-105598-1-1.html "一键读取Txt、Excel等表格配置【源码+原理】")里提出来，有时间一定立马回复，意见一经采纳就被列入“贡献者名单”。

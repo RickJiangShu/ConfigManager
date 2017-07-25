@@ -8,7 +8,7 @@
 5. **防止出错**："."操作符索引数据，编译器自动检查。
 
 # 快速使用
-### 编辑配置
+### 编辑配置：
 ![](https://raw.githubusercontent.com/RickJiangShu/ConfigManager-Example/master/Poster/p3.jpg "")<br>
 [表格配置说明](https://github.com/RickJiangShu/ConfigManager-Example/blob/master/Doc/Sheet.md "表格配置说明")<br>
 [Json配置说明](https://github.com/RickJiangShu/ConfigManager-Example/blob/master/Doc/Json.md "Json配置说明")<br>
@@ -40,7 +40,7 @@ print(monsterSheet.name);
 
 ![](https://raw.githubusercontent.com/RickJiangShu/ConfigManager-Example/master/Poster/p7.jpg "")
 
-### 范例
+### 范例：
 https://github.com/RickJiangShu/ConfigManager-Example
 
 # 贡献者名单

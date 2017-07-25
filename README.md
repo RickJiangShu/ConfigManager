@@ -8,11 +8,11 @@
 5. **防止出错**："."操作符索引数据，编译器自动检查。
 
 # 快速使用
-### 写配置
+### 编辑配置
 ![](https://raw.githubusercontent.com/RickJiangShu/ConfigManager-Example/master/Poster/p3.jpg "")<br>
-[表格配置说明](https://github.com/RickJiangShu/ConfigManager-Example/blob/master/Doc/Sheet.md "表格配置说明")
-[Json配置说明](https://github.com/RickJiangShu/ConfigManager-Example/blob/master/Doc/Json.md "Json配置说明")
-[Xml配置说明](https://github.com/RickJiangShu/ConfigManager-Example/blob/master/Doc/Xml.md "Xml配置说明")
+[表格配置说明](https://github.com/RickJiangShu/ConfigManager-Example/blob/master/Doc/Sheet.md "表格配置说明")<br>
+[Json配置说明](https://github.com/RickJiangShu/ConfigManager-Example/blob/master/Doc/Json.md "Json配置说明")<br>
+[Xml配置说明](https://github.com/RickJiangShu/ConfigManager-Example/blob/master/Doc/Xml.md "Xml配置说明")<br>
 
 ### 编辑器：
 1. 点击菜单栏"Window/Config Manager"；

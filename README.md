@@ -1,4 +1,4 @@
-![logo](https://raw.githubusercontent.com/RickJiangShu/ConfigManager-Example/master/Poster/Logo.jpg "logo")
+![logo](https://github.com/RickJiangShu/ConfigManager-Example/blob/master/Poster/Icon/Icon516x389.png "logo")
 
 # 本工具优势
 1. **光速解析**：解析完全放在编辑模式下完成，运行时只需加载序列化文件即可。

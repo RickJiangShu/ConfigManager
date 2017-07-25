@@ -8,14 +8,13 @@
 5. **防止出错**："."操作符索引数据，编译器自动检查。
 
 # 快速使用
-### 编辑器：
+## 编辑器：
 1. 点击菜单栏"Window/Config Manager"；
 2. 设置对应的输入/输出路径；
 3. 点击Output。
-
 ![](https://raw.githubusercontent.com/RickJiangShu/ConfigManager-Example/master/Poster/p4.jpg "")
 <br>
-### 运行时：
+## 运行时：
 1. 调用反序列化接口；
 2. 使用配置文件。
 ```
@@ -31,35 +30,10 @@ Deserializer.Deserialize(set);
 MonsterSheet monsterSheet = MonsterSheet.Get(210102)
 print(monsterSheet.name);
 ```
-### 范例
+![](https://raw.githubusercontent.com/RickJiangShu/ConfigManager-Example/master/Poster/p7.jpg "")
+
+## 范例
 https://github.com/RickJiangShu/ConfigManager-Example
-# 特点
-### 高性能
-大量数据的解析工作完全放在编辑器下完成。<br>
-![](https://raw.githubusercontent.com/RickJiangShu/ConfigManager-Example/master/Poster/p1.jpg "")
-<br>
-### 易用
-提供了操作简单的编辑窗口，轻松点击鼠标操作。<br>
-![](https://raw.githubusercontent.com/RickJiangShu/ConfigManager-Example/master/Poster/p2.jpg "")  
-<br>
-### 解耦
-不关心您项目的资源管理策略，只需在加载配置文件后调用Deserializer即可。<br>
-```
-//Resource加载
-SerializableSet set = Resources.Load<SerializableSet>("SerializableSet");
-Deserializer.Deserialize(set);
-
-//AssetBundle加载
-AssetBundle bundle = AssetBundle.LoadFromFile(Application.streamingAssetsPath + "/config.ab");
-SerializableSet set = bundle.LoadAsset<SerializableSet>("SerializableSet");
-Deserializer.Deserialize(set);
-```
-### 支持多种格式
-目前支持的格式有：.txt .csv<br>
-未来支持：.json .xml，请关注~<br>
-
-### 直接配置数据类型
-支持所有C#值类型和数组类型，合理运用有助于减少内存占用。<br>
 
 # 表格格式
 以列为属性，以行为一项；<br>

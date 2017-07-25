@@ -28,8 +28,8 @@ set = bundle.LoadAsset<SerializableSet>("SerializableSet");
 Deserializer.Deserialize(set);
 */
         
-MonsterConfig monsterCfg = MonsterConfig.Get(210102)
-print(monsterCfg.name);
+MonsterSheet monsterSheet = MonsterSheet.Get(210102)
+print(monsterSheet.name);
 ```
 ### 范例
 https://github.com/RickJiangShu/ConfigManager-Example

@@ -1,3 +1,7 @@
+# Config Manager
+性能最高、最简单的配置管理工具<br>
+
+*其他语言版本: [简体中文](README.md) [English](README.en.md)*
 ![logo](https://github.com/RickJiangShu/ConfigManager-Example/blob/master/Poster/Icon/Icon516x389.png "logo")
 
 # 本工具优势

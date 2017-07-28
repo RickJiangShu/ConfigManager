@@ -54,3 +54,4 @@ https://github.com/RickJiangShu/ConfigManager-Example
 3. fuliufuliu 希望直接解析xls和xlsx文件
 4. zhengyiunity MAC电脑上解析时，注释部分中文乱码。
 5. takaaptech 让我意识到不要覆盖AssetBundleName和提供打包回调接口
+6. nijjkk 反馈在Mac上Excel输入中文会带拼音

@@ -6,8 +6,7 @@
  */
 namespace ConfigManagerEditor
 {
-    using Excel;
-    using System.Data;
+    using OfficeOpenXml;
     using System.Text.RegularExpressions;
     /// <summary>
     /// SheetParser
@@ -20,24 +19,24 @@ namespace ConfigManagerEditor
         /// </summary>
         /// <param name="tabel"></param>
         /// <returns></returns>
-        public static SheetSource Parse(DataTable table,string fileName)
+        public static SheetSource Parse(ExcelWorksheet sheet, string fileName)
         {
-            int column = table.Columns.Count;
-            int row = table.Rows.Count;
+            int row = sheet.Dimension.Rows;
+            int column = sheet.Dimension.Columns;
 
             string[,] matrix = new string[row, column];
             for (int i = 0; i < row; i++)
             {
                 for (int j = 0; j < column; j++)
                 {
-                    string value = table.Rows[i][j].ToString();
+                    string value = sheet.GetValue<string>(i + 1, j + 1);
                     matrix[i, j] = value;
                 }
             }
             ConvertOriginalType(matrix);
             string originalName = fileName.Substring(0, fileName.LastIndexOf('.'));
             string className = originalName + "Sheet";
-            return CreateSource(table, originalName, className, matrix);
+            return CreateSource(sheet, originalName, className, matrix);
         }
 
         /// <summary>

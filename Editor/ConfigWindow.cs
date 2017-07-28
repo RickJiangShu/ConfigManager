@@ -12,9 +12,8 @@ namespace ConfigManagerEditor
     using System.IO;
     using System.Collections.Generic;
     using System.Text;
-    using Excel;
-    using System.Data;
     using System.Text.RegularExpressions;
+    using OfficeOpenXml;
 
     /// <summary>
     /// ConfigManager窗口
@@ -243,16 +242,16 @@ namespace ConfigManagerEditor
                 if(!TypeEnabled(file.Extension,out type))
                     continue;
 
-                DataTable excelData = null;
+                ExcelWorksheet excelData = null;
                 string content = "";
 
                 //读取Excel
                 if (type == OriginalType.Xls || type == OriginalType.Xlsx)
                 {
                     FileStream stream = File.Open(file.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                    IExcelDataReader excelReader = type == OriginalType.Xlsx ? ExcelReaderFactory.CreateOpenXmlReader(stream) : ExcelReaderFactory.CreateBinaryReader(stream);
-                    DataSet set = excelReader.AsDataSet();
-                    excelData = set.Tables[0];
+                    ExcelPackage package = new ExcelPackage(stream);
+                    excelData = package.Workbook.Worksheets[1];
+                    
                     stream.Close();
                 }
                 //其他

@@ -1,9 +1,7 @@
 # Config Manager
 Fast & Easy Config Manage Tool<br>
 
-*Read this in other languages: [简体中文](README.md) [English](README.en.md)*
-
-
+*Read this in other languages: [简体中文](README.md) [English](README.en.md)*<br>
 ![logo](https://github.com/RickJiangShu/ConfigManager-Example/blob/master/Poster/Icon/Icon516x389.png "logo")
 
 # Features

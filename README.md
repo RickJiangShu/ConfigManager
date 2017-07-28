@@ -1,5 +1,6 @@
 # Config Manager
-性能最高、最简单的配置管理工具<br>
+ConfigManager帮您一键生成配置对应的解析类，并将其序列化。<br>
+你只需轻点鼠标即可读取配置~<br>
 
 *其他语言版本: [简体中文](README.md) [English](README.en.md)*<br>
 ![logo](https://github.com/RickJiangShu/ConfigManager-Example/blob/master/Poster/Icon/Icon516x389.png "logo")

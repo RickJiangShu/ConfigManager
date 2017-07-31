@@ -19,7 +19,7 @@ namespace ConfigManagerEditor
         //解析键值对
         private const string regexPairOf = @"\s*" + regexString + @"\s*:\s*";//\s*"([^"]*)"\s*:\s*
 
-        private const string regexPairOfObject = regexPairOf + regexObject;
+        private const string regexPairOfObject = regexPairOf + regexObject + @"(?=(?:[^\[]*\[[\s\S]*\])*[^\]]*$)";//防止数组中的对象
         private const string regexPairOfArray = regexPairOf + regexArray;
         private const string regexPairOfString = regexPairOf + regexString;
         private const string regexPairOfNumber = regexPairOf + regexNumber;
@@ -28,7 +28,7 @@ namespace ConfigManagerEditor
 
         //对象
         //private const string regexObject = @"\{((?>\{(?<c>)|[^\{\}]+|\}(?<-c>))*(?(c)(?!)))\}";//Fork：https://stackoverflow.com/questions/546433/regular-expression-to-match-outer-brackets
-        private const string regexObject = @"(?<!\[[\s\S]*)\{((?>\{(?<c>)|[^\{\}]+|\}(?<-c>))*(?(c)(?!)))\}";//前面不含[的{}
+        private const string regexObject = @"\{((?>\{(?<c>)|[^\{\}]+|\}(?<-c>))*(?(c)(?!)))\}";
 
         //数组
         private const string regexArray = @"\[((?>\[(?<c>)|[^\[\]]+|\](?<-c>))*(?(c)(?!)))\]";

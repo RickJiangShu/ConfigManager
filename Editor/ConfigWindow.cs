@@ -20,8 +20,8 @@ namespace ConfigManagerEditor
     /// </summary>
     public class ConfigWindow : EditorWindow
     {
-        private const string cacheKey = "ConfigManagerCache";
-        private const string assetName = "SerializableSet.asset";
+        private const string CACHE_DISK_NAME = "ConfigManagerCache.json";
+        private const string ASSET_NAME = "SerializableSet.asset";
 
         private static bool justRecompiled;
 
@@ -42,6 +42,11 @@ namespace ConfigManagerEditor
         /// 缓存数据
         /// </summary>
         public Cache cache;
+
+        /// <summary>
+        /// 缓存磁盘路径
+        /// </summary>
+        private string cacheDiskPath;
 
         void Awake()
         {
@@ -81,7 +86,7 @@ namespace ConfigManagerEditor
             if (GUILayout.Button("Clear Output"))
             {
                 if (EditorUtility.DisplayDialog("Clear Output",
-                "Are you sure you want to clear " + cache.configOutputFolder + " and " + cache.assetOutputFolder + "/" + assetName, 
+                "Are you sure you want to clear " + cache.configOutputFolder + " and " + cache.assetOutputFolder + "/" + ASSET_NAME, 
                 "Yes", "No"))
                 {
                     ClearOutput();
@@ -115,7 +120,7 @@ namespace ConfigManagerEditor
             }
 
             ////Clear Asset
-            string assetPath = cache.assetOutputFolder + "/" + assetName;
+            string assetPath = cache.assetOutputFolder + "/" + ASSET_NAME;
             if(File.Exists(assetPath))
             {
                 File.Delete(assetPath);
@@ -192,18 +197,44 @@ namespace ConfigManagerEditor
             justRecompiled = false;
         }
 
+
+        /// <summary>
+        /// 获取磁盘中的
+        /// </summary>
+        /// <returns></returns>
+        private bool TryGetDiskCache(out string content,out string path)
+        {
+            DirectoryInfo assetFolder = new DirectoryInfo(Application.dataPath);
+            FileInfo[] files = assetFolder.GetFiles(CACHE_DISK_NAME, SearchOption.AllDirectories);
+            if (files.Length > 0)
+            {
+                StreamReader stream = files[0].OpenText();
+                content = stream.ReadToEnd();
+                path = files[0].FullName;
+                stream.Close();
+                return true;
+            }
+            content = "";
+            path = "";
+            return false;
+        }
+
         /// <summary>
         /// 加载缓存或初始化
         /// </summary>
         private void LoadCache()
         {
-            if (PlayerPrefs.HasKey(cacheKey))
+            string content;
+            string path;
+            if (TryGetDiskCache(out content,out path))
             {
-                cache = JsonUtility.FromJson<Cache>(PlayerPrefs.GetString(cacheKey));
+                cache = JsonUtility.FromJson<Cache>(content);
+                cacheDiskPath = path;
             }
             else
             {
                 cache = new Cache();
+                cacheDiskPath = "Assets/" + CACHE_DISK_NAME;
             }
         }
 
@@ -212,8 +243,8 @@ namespace ConfigManagerEditor
         /// </summary>
         public void SaveCache()
         {
-            string json = JsonUtility.ToJson(cache);
-            PlayerPrefs.SetString(cacheKey, json);
+            string json = JsonUtility.ToJson(cache, true);
+            ConfigTools.WriteFile(cacheDiskPath, json);
         }
 
 
@@ -241,23 +272,30 @@ namespace ConfigManagerEditor
                 if(!TypeEnabled(file.Extension,out type))
                     continue;
 
+                //可以同时读流
+                FileStream fileStream = file.Open(FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+
                 ExcelWorksheet excelData = null;
                 string content = "";
 
                 //读取Excel
                 if (type == OriginalType.Xlsx)
                 {
-                    FileStream stream = File.Open(file.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                    ExcelPackage package = new ExcelPackage(stream);
+                    ExcelPackage package = new ExcelPackage(fileStream);
                     excelData = package.Workbook.Worksheets[1];
                     
-                    stream.Close();
+                    fileStream.Close();
                 }
                 //其他
                 else
                 {
+                    //读Byte
                     byte[] bytes;
-                    ConfigTools.ReadFile(file.FullName, out bytes);
+                    BinaryReader br = new BinaryReader(fileStream);
+                    bytes = br.ReadBytes((int)fileStream.Length);
+                    StreamReader renderer = new StreamReader(fileStream);
+                    content = renderer.ReadToEnd();
+
                     ConfigTools.DetectTextEncoding(bytes, out content);//转换不同的编码格式
 
                     if (string.IsNullOrEmpty(content))
@@ -336,7 +374,7 @@ namespace ConfigManagerEditor
 
             //通过反射序列化
             UnityEngine.Object set = (UnityEngine.Object)Serializer.Serialize(sheets, structs);
-            string o = cache.assetOutputFolder + "/" + assetName;
+            string o = cache.assetOutputFolder + "/" + ASSET_NAME;
 
             if (File.Exists(o))
             {

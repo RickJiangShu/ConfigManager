@@ -363,6 +363,7 @@ namespace ConfigManagerEditor
             writer.Close();
         }
 
+
         /// <summary>
         /// 读取文件内容 
         /// Fork:
@@ -371,9 +372,8 @@ namespace ConfigManagerEditor
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public static string ReadFile(string path,out byte[] bytes)
+        public static string ReadFile(FileStream fileStream,out byte[] bytes)
         {
-            FileStream fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             BinaryReader br = new BinaryReader(fileStream);
             bytes = br.ReadBytes((int)fileStream.Length);
             StreamReader renderer = new StreamReader(fileStream);

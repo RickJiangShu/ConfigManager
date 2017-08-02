@@ -19,18 +19,21 @@ namespace ConfigManagerEditor
         static void Set2SourcePath()
         {
             ConfigWindow.Get().cache.sourceFolder = GetSelectedPathOrFallback();
+            ConfigWindow.Get().SaveCache();
         }
 
         [MenuItem("Assets/Config Manager/Set to Config Output")]
         static void Set2ConfigOutput()
         {
             ConfigWindow.Get().cache.configOutputFolder = GetSelectedPathOrFallback();
+            ConfigWindow.Get().SaveCache();
         }
 
         [MenuItem("Assets/Config Manager/Set to Asset Output")]
         static void Set2AssetOutput()
         {
             ConfigWindow.Get().cache.assetOutputFolder = GetSelectedPathOrFallback();
+            ConfigWindow.Get().SaveCache();
         }
 
 

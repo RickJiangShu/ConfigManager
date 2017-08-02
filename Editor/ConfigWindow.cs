@@ -66,7 +66,6 @@ namespace ConfigManagerEditor
             cache.csvEnabled = EditorGUILayout.Toggle("*.csv", cache.csvEnabled);
             cache.jsonEnabled = EditorGUILayout.Toggle("*.json", cache.jsonEnabled);
             cache.xmlEnabled = EditorGUILayout.Toggle("*.xml", cache.xmlEnabled);
-            cache.xlsEnabled = EditorGUILayout.Toggle("*.xls", cache.xlsEnabled);
             cache.xlsxEnabled = EditorGUILayout.Toggle("*.xlsx", cache.xlsxEnabled);
 
             //Operation
@@ -246,7 +245,7 @@ namespace ConfigManagerEditor
                 string content = "";
 
                 //读取Excel
-                if (type == OriginalType.Xls || type == OriginalType.Xlsx)
+                if (type == OriginalType.Xlsx)
                 {
                     FileStream stream = File.Open(file.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                     ExcelPackage package = new ExcelPackage(stream);
@@ -304,7 +303,6 @@ namespace ConfigManagerEditor
                             UnityEngine.Debug.LogError(file.Name + "解析失败！请检查格式是否正确，如果格式正确请联系作者：https://github.com/RickJiangShu/ConfigManager/issues" + "\n" + e);
                         }
                         break;
-                    case OriginalType.Xls:
                     case OriginalType.Xlsx:
                         try
                         {
@@ -378,9 +376,6 @@ namespace ConfigManagerEditor
                 case ".xml":
                     type = OriginalType.Xml;
                     return cache.xmlEnabled;
-                case ".xls":
-                    type = OriginalType.Xls;
-                    return cache.xlsEnabled;
                 case ".xlsx":
                     type = OriginalType.Xlsx;
                     return cache.xlsxEnabled;
@@ -410,7 +405,7 @@ namespace ConfigManagerEditor
         public bool csvEnabled = true;
         public bool jsonEnabled = true;
         public bool xmlEnabled = true;
-        public bool xlsEnabled = true;
+      //  public bool xlsEnabled = true;
         public bool xlsxEnabled = true;
 
         public string serializerOutputFolder { get { return configOutputFolder + "/Serializer"; } }

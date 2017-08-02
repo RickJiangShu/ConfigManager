@@ -36,7 +36,7 @@ namespace ConfigManagerEditor
         Csv,
         Json,
         Xml,
-        Xls,
+     //   Xls, 插件不支持
         Xlsx,
      //   Sheet,//表格型数据 txt csv
      //   Struct,//结构型数据 json xml

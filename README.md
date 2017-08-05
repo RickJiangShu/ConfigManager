@@ -57,3 +57,4 @@ https://github.com/RickJiangShu/ConfigManager-Example
 5. takaaptech 让我意识到不要覆盖AssetBundleName和提供打包回调接口
 6. nijjkk 反馈在Mac上Excel输入中文会带拼音
 7. Hazukiaoi 反馈Json解析问题
+8. kaifeng0301 提供“按需加载”的需求（尚未支持）

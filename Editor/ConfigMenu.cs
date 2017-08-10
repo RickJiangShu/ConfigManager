@@ -15,6 +15,13 @@ namespace ConfigManagerEditor
     /// </summary>
     public class ConfigMenu : ScriptableObject
     {
+        [MenuItem("Assets/Config Manager/Copy path to clipboard")]
+        static void CopyPathToClipboard()
+        {
+            string path = GetSelectedPathOrFallback();
+            GUIUtility.systemCopyBuffer = path;
+        }
+
         [MenuItem("Assets/Config Manager/Set to Source Path")]
         static void Set2SourcePath()
         {

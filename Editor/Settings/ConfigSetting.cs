@@ -44,7 +44,6 @@ namespace ConfigManagerEditor
             //如果在Assets/目录下找到配置文件
             if (File.Exists(SETTING_PATH))
             {
-                //FileStream stream = File.Open(SETTING_PATH, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 StreamReader reader = new StreamReader(SETTING_PATH);
                 content = reader.ReadToEnd();
                 reader.Close();

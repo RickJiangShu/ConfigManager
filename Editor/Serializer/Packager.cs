@@ -8,6 +8,8 @@ using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using OfficeOpenXml;
+using System;
 
 namespace ConfigManagerEditor
 {
@@ -23,40 +25,8 @@ namespace ConfigManagerEditor
         /// <param name="configPaths">选中的配置路径</param>
         public static void Pack(string packageName, List<string> configPaths)
         {
-            for (int i = 0, c = configPaths.Count; i < c; i++)
-            {
-                string path = configPaths[i];
-                string extension = Path.GetExtension(path);
-            }
         }
 
-        /// <summary>
-        /// 检测类型是否启用
-        /// </summary>
-        /// <param name="extension"></param>
-        /// <returns></returns>
-        private static bool TypeEnabled(string extension, out OriginalType type)
-        {
-            switch (extension)
-            {
-                case ".txt":
-                    type = OriginalType.Txt;
-                    return ConfigSettings.ins.txtEnabled;
-                case ".csv":
-                    type = OriginalType.Csv;
-                    return ConfigSettings.ins.csvEnabled;
-                case ".json":
-                    type = OriginalType.Json;
-                    return ConfigSettings.ins.jsonEnabled;
-                case ".xml":
-                    type = OriginalType.Xml;
-                    return ConfigSettings.ins.xmlEnabled;
-                case ".xlsx":
-                    type = OriginalType.Xlsx;
-                    return ConfigSettings.ins.xlsxEnabled;
-            }
-            type = OriginalType.Txt;
-            return false;
-        }
+
     }
 }

@@ -40,9 +40,9 @@ namespace ConfigManagerEditor
         /// <summary>
         /// 配置文件
         /// </summary>
-        public ConfigSetting setting
+        public ConfigSettings setting
         {
-            get { return ConfigSetting.ins; }
+            get { return ConfigSettings.ins; }
         }
 
 
@@ -99,7 +99,7 @@ namespace ConfigManagerEditor
             //缓存设置
             if (GUI.changed)
             {
-                ConfigSetting.Save();
+                ConfigSettings.Save();
             }
         }
 

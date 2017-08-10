@@ -41,19 +41,19 @@ namespace ConfigManagerEditor
             {
                 case ".txt":
                     type = OriginalType.Txt;
-                    return ConfigSetting.ins.txtEnabled;
+                    return ConfigSettings.ins.txtEnabled;
                 case ".csv":
                     type = OriginalType.Csv;
-                    return ConfigSetting.ins.csvEnabled;
+                    return ConfigSettings.ins.csvEnabled;
                 case ".json":
                     type = OriginalType.Json;
-                    return ConfigSetting.ins.jsonEnabled;
+                    return ConfigSettings.ins.jsonEnabled;
                 case ".xml":
                     type = OriginalType.Xml;
-                    return ConfigSetting.ins.xmlEnabled;
+                    return ConfigSettings.ins.xmlEnabled;
                 case ".xlsx":
                     type = OriginalType.Xlsx;
-                    return ConfigSetting.ins.xlsxEnabled;
+                    return ConfigSettings.ins.xlsxEnabled;
             }
             type = OriginalType.Txt;
             return false;

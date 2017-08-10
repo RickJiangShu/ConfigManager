@@ -15,24 +15,19 @@ namespace ConfigManagerEditor
     /// ConfigManager 配置文件
     /// </summary>
     [System.Serializable]
-    public class ConfigSetting
+    public class ConfigSettings
     {
         #region 单例与磁盘加载
         /// <summary>
-        /// 磁盘中的命名
-        /// </summary>
-        private const string SETTING_DISK_NAME = "ConfigSetting.json";
-
-        /// <summary>
         /// 缓存磁盘路径（默认在Assets/下）
         /// </summary>
-        private static string settingDiskPath;
+        private static string SETTING_PATH = "Assets/ConfigSetting.json";
 
         /// <summary>
         /// 单例引用
         /// </summary>
-        private static ConfigSetting setting;
-        public static ConfigSetting ins
+        private static ConfigSettings setting;
+        public static ConfigSettings ins
         {
             get
             {
@@ -45,45 +40,29 @@ namespace ConfigManagerEditor
         private static void Load()
         {
             string content;
-            string path;
             
             //如果在Assets/目录下找到配置文件
-            if (TryGetDiskCache(out content, out path))
+            if (File.Exists(SETTING_PATH))
             {
-                setting = JsonUtility.FromJson<ConfigSetting>(content);
-                settingDiskPath = path;
+                //FileStream stream = File.Open(SETTING_PATH, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                StreamReader reader = new StreamReader(SETTING_PATH);
+                content = reader.ReadToEnd();
+                reader.Close();
+
+                setting = JsonUtility.FromJson<ConfigSettings>(content);
             }
             else
             {
-                setting = new ConfigSetting();
-                settingDiskPath = "Assets/" + SETTING_DISK_NAME;
+                setting = new ConfigSettings();
+                Save();
             }
         }
+
         public static void Save()
         {
             string json = JsonUtility.ToJson(setting, true);
-            ConfigTools.WriteFile(settingDiskPath, json);
-        }
-
-        /// <summary>
-        /// 获取磁盘中的缓存
-        /// </summary>
-        /// <returns></returns>
-        private static bool TryGetDiskCache(out string content, out string path)
-        {
-            DirectoryInfo assetFolder = new DirectoryInfo(Application.dataPath);
-            FileInfo[] files = assetFolder.GetFiles(SETTING_DISK_NAME, SearchOption.AllDirectories);
-            if (files.Length > 0)
-            {
-                StreamReader stream = files[0].OpenText();
-                content = stream.ReadToEnd();
-                path = files[0].FullName;
-                stream.Close();
-                return true;
-            }
-            content = "";
-            path = "";
-            return false;
+            ConfigTools.WriteFile(SETTING_PATH, json);
+            UnityEditor.AssetDatabase.Refresh();
         }
         #endregion
 

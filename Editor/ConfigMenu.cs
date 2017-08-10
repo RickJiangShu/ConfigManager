@@ -18,22 +18,25 @@ namespace ConfigManagerEditor
         [MenuItem("Assets/Config Manager/Set to Source Path")]
         static void Set2SourcePath()
         {
-            ConfigWindow.Get().cache.sourceFolder = GetSelectedPathOrFallback();
-            ConfigWindow.Get().SaveCache();
+            ConfigSetting.ins.sourceFolder = GetSelectedPathOrFallback();
+            ConfigSetting.Save();
+            ConfigWindow.Get().Repaint();
         }
 
         [MenuItem("Assets/Config Manager/Set to Config Output")]
         static void Set2ConfigOutput()
         {
-            ConfigWindow.Get().cache.configOutputFolder = GetSelectedPathOrFallback();
-            ConfigWindow.Get().SaveCache();
+            ConfigSetting.ins.configOutputFolder = GetSelectedPathOrFallback();
+            ConfigSetting.Save();
+            ConfigWindow.Get().Repaint();
         }
 
         [MenuItem("Assets/Config Manager/Set to Asset Output")]
         static void Set2AssetOutput()
         {
-            ConfigWindow.Get().cache.assetOutputFolder = GetSelectedPathOrFallback();
-            ConfigWindow.Get().SaveCache();
+            ConfigSetting.ins.assetOutputFolder = GetSelectedPathOrFallback();
+            ConfigSetting.Save();
+            ConfigWindow.Get().Repaint();
         }
 
 

@@ -20,7 +20,6 @@ namespace ConfigManagerEditor
     /// </summary>
     public class ConfigWindow : EditorWindow
     {
-        private const string CACHE_DISK_NAME = "ConfigManagerCache.json";
         private const string ASSET_NAME = "SerializableSet.asset";
 
         private static bool justRecompiled;
@@ -39,18 +38,16 @@ namespace ConfigManagerEditor
         }
 
         /// <summary>
-        /// 缓存数据
+        /// 配置文件
         /// </summary>
-        public Cache cache;
+        public ConfigSetting setting
+        {
+            get { return ConfigSetting.ins; }
+        }
 
-        /// <summary>
-        /// 缓存磁盘路径
-        /// </summary>
-        private string cacheDiskPath;
 
         void Awake()
         {
-            LoadCache();
         }
 
 
@@ -59,19 +56,19 @@ namespace ConfigManagerEditor
             //Base Settings
             GUILayout.Label("Base Settings", EditorStyles.boldLabel);
 
-            cache.sourceFolder = EditorGUILayout.TextField("Source Folder", cache.sourceFolder);
-            cache.configOutputFolder = EditorGUILayout.TextField("Config Output", cache.configOutputFolder);
-            cache.assetOutputFolder = EditorGUILayout.TextField("Asset Output", cache.assetOutputFolder);
+            setting.sourceFolder = EditorGUILayout.TextField("Source Folder", setting.sourceFolder);
+            setting.configOutputFolder = EditorGUILayout.TextField("Config Output", setting.configOutputFolder);
+            setting.assetOutputFolder = EditorGUILayout.TextField("Asset Output", setting.assetOutputFolder);
 
             //Source Type
             EditorGUILayout.Space();
             GUILayout.Label("Original Type", EditorStyles.boldLabel);
 
-            cache.txtEnabled = EditorGUILayout.Toggle("*.txt", cache.txtEnabled);
-            cache.csvEnabled = EditorGUILayout.Toggle("*.csv", cache.csvEnabled);
-            cache.jsonEnabled = EditorGUILayout.Toggle("*.json", cache.jsonEnabled);
-            cache.xmlEnabled = EditorGUILayout.Toggle("*.xml", cache.xmlEnabled);
-            cache.xlsxEnabled = EditorGUILayout.Toggle("*.xlsx", cache.xlsxEnabled);
+            setting.txtEnabled = EditorGUILayout.Toggle("*.txt", setting.txtEnabled);
+            setting.csvEnabled = EditorGUILayout.Toggle("*.csv", setting.csvEnabled);
+            setting.jsonEnabled = EditorGUILayout.Toggle("*.json", setting.jsonEnabled);
+            setting.xmlEnabled = EditorGUILayout.Toggle("*.xml", setting.xmlEnabled);
+            setting.xlsxEnabled = EditorGUILayout.Toggle("*.xlsx", setting.xlsxEnabled);
 
             //Operation
             EditorGUILayout.Space();
@@ -86,7 +83,7 @@ namespace ConfigManagerEditor
             if (GUILayout.Button("Clear Output"))
             {
                 if (EditorUtility.DisplayDialog("Clear Output",
-                "Are you sure you want to clear " + cache.configOutputFolder + " and " + cache.assetOutputFolder + "/" + ASSET_NAME, 
+                "Are you sure you want to clear " + setting.configOutputFolder + " and " + setting.assetOutputFolder + "/" + ASSET_NAME, 
                 "Yes", "No"))
                 {
                     ClearOutput();
@@ -102,7 +99,7 @@ namespace ConfigManagerEditor
             //缓存设置
             if (GUI.changed)
             {
-                SaveCache();
+                ConfigSetting.Save();
             }
         }
 
@@ -112,15 +109,15 @@ namespace ConfigManagerEditor
         private void ClearOutput()
         {
             //Clear Config
-            if (Directory.Exists(cache.configOutputFolder))
+            if (Directory.Exists(setting.configOutputFolder))
             {
-                Directory.Delete(cache.configOutputFolder, true);
-                File.Delete(cache.configOutputFolder + ".meta");
+                Directory.Delete(setting.configOutputFolder, true);
+                File.Delete(setting.configOutputFolder + ".meta");
 
             }
 
             ////Clear Asset
-            string assetPath = cache.assetOutputFolder + "/" + ASSET_NAME;
+            string assetPath = setting.assetOutputFolder + "/" + ASSET_NAME;
             if(File.Exists(assetPath))
             {
                 File.Delete(assetPath);
@@ -136,13 +133,13 @@ namespace ConfigManagerEditor
         private void Output()
         {
             //检出输出目录
-            if (!Directory.Exists(cache.configOutputFolder))
+            if (!Directory.Exists(setting.configOutputFolder))
             {
-                Directory.CreateDirectory(cache.configOutputFolder);
+                Directory.CreateDirectory(setting.configOutputFolder);
             }
-            if (!Directory.Exists(cache.serializerOutputFolder))
+            if (!Directory.Exists(setting.serializerOutputFolder))
             {
-                Directory.CreateDirectory(cache.serializerOutputFolder);
+                Directory.CreateDirectory(setting.serializerOutputFolder);
             }
 
             //获取源
@@ -153,18 +150,18 @@ namespace ConfigManagerEditor
 
             if (sheets.Count == 0 && structs.Count == 0)
             {
-                Debug.LogError(cache.sourceFolder + "没有找到任何文件！");
+                Debug.LogError(setting.sourceFolder + "没有找到任何文件！");
                 return;
             }
 
-            SheetGenerator.Generate(sheets, cache.configOutputFolder);//生产Configs
-            StructGenerator.Generate(structs, cache.configOutputFolder);//生成Jsons
+            SheetGenerator.Generate(sheets, setting.configOutputFolder);//生产Configs
+            StructGenerator.Generate(structs, setting.configOutputFolder);//生成Jsons
             
             //生产SerializableSet
-            SerializableSetGenerator.Generate(sheets, structs, cache.serializerOutputFolder);
+            SerializableSetGenerator.Generate(sheets, structs, setting.serializerOutputFolder);
 
             //生产Deserializer
-            DeserializerGenerator.Generate(sheets, structs, cache.serializerOutputFolder);
+            DeserializerGenerator.Generate(sheets, structs, setting.serializerOutputFolder);
 
             //刷新
             AssetDatabase.Refresh();
@@ -196,58 +193,7 @@ namespace ConfigManagerEditor
             }
             justRecompiled = false;
         }
-
-
-        /// <summary>
-        /// 获取磁盘中的
-        /// </summary>
-        /// <returns></returns>
-        private bool TryGetDiskCache(out string content,out string path)
-        {
-            DirectoryInfo assetFolder = new DirectoryInfo(Application.dataPath);
-            FileInfo[] files = assetFolder.GetFiles(CACHE_DISK_NAME, SearchOption.AllDirectories);
-            if (files.Length > 0)
-            {
-                StreamReader stream = files[0].OpenText();
-                content = stream.ReadToEnd();
-                path = files[0].FullName;
-                stream.Close();
-                return true;
-            }
-            content = "";
-            path = "";
-            return false;
-        }
-
-        /// <summary>
-        /// 加载缓存或初始化
-        /// </summary>
-        private void LoadCache()
-        {
-            string content;
-            string path;
-            if (TryGetDiskCache(out content,out path))
-            {
-                cache = JsonUtility.FromJson<Cache>(content);
-                cacheDiskPath = path;
-            }
-            else
-            {
-                cache = new Cache();
-                cacheDiskPath = "Assets/" + CACHE_DISK_NAME;
-            }
-        }
-
-        /// <summary>
-        /// 保存缓存
-        /// </summary>
-        public void SaveCache()
-        {
-            string json = JsonUtility.ToJson(cache, true);
-            ConfigTools.WriteFile(cacheDiskPath, json);
-        }
-
-
+       
         /// <summary>
         /// 获取所有源
         /// </summary>
@@ -255,7 +201,7 @@ namespace ConfigManagerEditor
         private void GetSources(out List<SheetSource> sheets,out List<StructSource> structs)
         {
             //获取所有配置文件
-            DirectoryInfo directory = new DirectoryInfo(cache.sourceFolder);
+            DirectoryInfo directory = new DirectoryInfo(setting.sourceFolder);
             FileInfo[] files = directory.GetFiles("*.*", SearchOption.AllDirectories);
 
             //源
@@ -362,9 +308,9 @@ namespace ConfigManagerEditor
         private void Serialize()
         {
             //如果输出文件夹不存在，先创建
-            if (!Directory.Exists(cache.assetOutputFolder))
+            if (!Directory.Exists(setting.assetOutputFolder))
             {
-                Directory.CreateDirectory(cache.assetOutputFolder);
+                Directory.CreateDirectory(setting.assetOutputFolder);
             }
 
             //无法缓存只能重新获取
@@ -374,7 +320,7 @@ namespace ConfigManagerEditor
 
             //通过反射序列化
             UnityEngine.Object set = (UnityEngine.Object)Serializer.Serialize(sheets, structs);
-            string o = cache.assetOutputFolder + "/" + ASSET_NAME;
+            string o = setting.assetOutputFolder + "/" + ASSET_NAME;
 
             if (File.Exists(o))
             {
@@ -404,19 +350,19 @@ namespace ConfigManagerEditor
             {
                 case ".txt":
                     type = OriginalType.Txt;
-                    return cache.txtEnabled;
+                    return setting.txtEnabled;
                 case ".csv":
                     type = OriginalType.Csv;
-                    return cache.csvEnabled;
+                    return setting.csvEnabled;
                 case ".json":
                     type = OriginalType.Json;
-                    return cache.jsonEnabled;
+                    return setting.jsonEnabled;
                 case ".xml":
                     type = OriginalType.Xml;
-                    return cache.xmlEnabled;
+                    return setting.xmlEnabled;
                 case ".xlsx":
                     type = OriginalType.Xlsx;
-                    return cache.xlsxEnabled;
+                    return setting.xlsxEnabled;
             }
             type = OriginalType.Txt;
             return false;
@@ -430,23 +376,6 @@ namespace ConfigManagerEditor
         {
             return Regex.Match(fileName, @"^\~\$").Success;
         }
-    }
-
-    [System.Serializable]
-    public class Cache
-    {
-        public string sourceFolder = "Assets";
-        public string configOutputFolder = "Assets/Output";
-        public string assetOutputFolder = "Assets/Resources";
-
-        public bool txtEnabled = true;
-        public bool csvEnabled = true;
-        public bool jsonEnabled = true;
-        public bool xmlEnabled = true;
-      //  public bool xlsEnabled = true;
-        public bool xlsxEnabled = true;
-
-        public string serializerOutputFolder { get { return configOutputFolder + "/Serializer"; } }
     }
 }
 

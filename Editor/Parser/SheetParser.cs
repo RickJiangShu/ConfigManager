@@ -70,7 +70,7 @@ namespace ConfigManagerEditor
             }
 
             string originalName = fileName.Substring(0, fileName.LastIndexOf('.'));
-            string className = originalName + "Sheet";
+            string className = originalName + "Config";
             string[,] matrix = Content2Matrix(content, sv, lf);
 
             if (isCsv)

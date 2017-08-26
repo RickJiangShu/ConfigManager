@@ -35,7 +35,7 @@ namespace ConfigManagerEditor
         [MenuItem("Window/Config Manager")]
         public static ConfigWindow Get()
         {
-            return EditorWindow.GetWindow<ConfigWindow>("Config Manager");
+            return EditorWindow.GetWindow<ConfigWindow>("Config");
         }
 
         /// <summary>

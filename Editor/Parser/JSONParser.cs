@@ -19,7 +19,7 @@ namespace ConfigManagerEditor
         //解析键值对
         private const string regexPairOf = @"\s*" + regexString + @"\s*:\s*";//\s*"([^"]*)"\s*:\s*
 
-        private const string regexPairOfObject = regexPairOf + regexObject + @"(?=(?:[^\[]*\[[\s\S]*\])*[^\]]*$)";//防止数组中的对象
+        private const string regexPairOfObject = regexPairOf + regexObject + @"(?=(?:[^\[]*\[[\]]*\])*[^\]]*$)";//防止数组中的对象
         private const string regexPairOfArray = regexPairOf + regexArray;
         private const string regexPairOfString = regexPairOf + regexString;
         private const string regexPairOfNumber = regexPairOf + regexNumber;

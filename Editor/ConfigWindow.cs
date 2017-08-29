@@ -319,10 +319,10 @@ namespace ConfigManagerEditor
                             UnityEngine.Debug.LogError(file.Name + "解析失败！请检查格式是否正确，如果格式正确请联系作者：https://github.com/RickJiangShu/ConfigManager/issues" + "\n" + e);
                         }
                         break;
-                    case OriginalType.Json: 
+                    case OriginalType.Json:
                         try
                         {
-                            StructSource st= JsonParser.Parse(content, file.Name);
+                            StructSource st = JsonParser.Parse(content, file.Name);
                             structs.Add(st);
                         }
                         catch (Exception e)

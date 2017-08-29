@@ -16,23 +16,6 @@ namespace ConfigManagerEditor
     public class JsonParser
     {
         #region 正则表达式
-        //解析键值对
-        private const string regexPairOf = @"\s*" + regexString + @"\s*:\s*";//\s*"([^"]*)"\s*:\s*
-
-        private const string regexPairOfObject = regexPairOf + regexObject + @"(?=(?:[^\[]*\[[\]]*\])*[^\]]*$)";//防止数组中的对象
-        private const string regexPairOfArray = regexPairOf + regexArray;
-        private const string regexPairOfString = regexPairOf + regexString;
-        private const string regexPairOfNumber = regexPairOf + regexNumber;
-        private const string regexPairOfBool = regexPairOf + regexBool;
-
-
-        //对象
-        //private const string regexObject = @"\{((?>\{(?<c>)|[^\{\}]+|\}(?<-c>))*(?(c)(?!)))\}";//Fork：https://stackoverflow.com/questions/546433/regular-expression-to-match-outer-brackets
-        private const string regexObject = @"\{((?>\{(?<c>)|[^\{\}]+|\}(?<-c>))*(?(c)(?!)))\}";
-
-        //数组
-        private const string regexArray = @"\[((?>\[(?<c>)|[^\[\]]+|\](?<-c>))*(?(c)(?!)))\]";
-
         //基础类型
         private const string regexString = "\"([^\"]*)\"";//"[^"]*"
         private const string regexNumber = @"(-?(?=[1-9]|0(?!\d))\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)";
@@ -47,259 +30,200 @@ namespace ConfigManagerEditor
             source.originalName = fileName.Substring(0, fileName.LastIndexOf('.')); ;//文件名
             source.className = source.originalName + "Json";//类名
 
-            source.obj = ParseRoot(content);
+            source.obj = ParseObject(content);
             return source;
         }
+        
 
         /// <summary>
-        /// 解析Json入口
+        /// 解析对象
         /// </summary>
-        /// <param name="json"></param>
+        /// <param name="contentOfObject"></param>
         /// <returns></returns>
-        private static Dictionary<string, object> ParseRoot(string json)
+        private static Dictionary<string, object> ParseObject(string contentOfObject)
         {
-            Match match = Regex.Match(json, regexObject);
-            if (match.Success)
-            {
-                string content = match.Groups[1].Value;
-                return ParseObject(ref content);
-            }
-            return null;
-        }
-        /// <summary>
-        /// 解析不带{} 为一个对象
-        /// </summary>
-        /// <param name="content"></param>
-        /// <returns></returns>
-        private static Dictionary<string, object> ParseObject(ref string content)
-        {
-            //解析members
-            Pair[] members = ParseMembers(ref content);
+            Dictionary<string, object> obj = new Dictionary<string, object>();
+            List<string> items = Split(contentOfObject);
 
-            //创建Object
-            Dictionary<string, object> result = new Dictionary<string, object>();
-            if (members != null)
+            for (int i = 0, l = items.Count; i < l; i++)
             {
-                for (int i = 0, l = members.Length; i < l; i++)
+                string item = items[i];
+                string name;
+                string contentOfValue;
+                SplitObject(item, out name, out contentOfValue);//切割对象
+
+                int type = IsObjectOrArray(contentOfValue);
+                object value = null;
+
+                switch (type)
                 {
-                    result.Add(members[i].key, members[i].value);
+                    case 0:
+                        value = ParseBaseValue(contentOfValue);
+                        break;
+                    case 1:
+                        value = ParseObject(contentOfValue);
+                        break;
+                    case 2:
+                        value = ParseArray(contentOfValue);
+                        break;
                 }
+                obj.Add(name, value);
             }
-            return result;
-        }
-
-        /// <summary>
-        /// 解析成员为键值对数组
-        /// </summary>
-        /// <param name="content"></param>
-        /// <returns></returns>
-        private static Pair[] ParseMembers(ref string content)
-        {
-            List<Pair> membersList = new List<Pair>();
-
-            string original = content.ToString();
-
-            //判断Object类型
-            Pair[] pairsOfObject = ParsePairs(ref content, regexPairOfObject);
-            foreach (Pair pair in pairsOfObject)
-            {
-                pair.index = original.IndexOf(pair.content);
-                pair.value = ParseObject(ref pair.content);
-            }
-            membersList.AddRange(pairsOfObject);
-
-            //判断Array类型 
-            Pair[] pairsOfArray = ParsePairs(ref content, regexPairOfArray);
-            foreach (Pair pair in pairsOfArray)
-            {
-                pair.index = original.IndexOf(pair.content);
-                pair.value = ParseArray(ref pair.content);
-            }
-            membersList.AddRange(pairsOfArray);
-
-            //判断String类型
-            Pair[] pairsOfString = ParsePairs(ref content, regexPairOfString);
-            foreach (Pair pair in pairsOfString)
-            {
-                pair.index = original.IndexOf(pair.content);
-                pair.value = pair.content;
-            }
-            membersList.AddRange(pairsOfString);
-
-            //判断Number类型
-            Pair[] pairsOfNumber = ParsePairs(ref content, regexPairOfNumber);
-            foreach (Pair pair in pairsOfNumber)
-            {
-                pair.index = original.IndexOf(pair.content);
-                pair.value = ConfigTools.ConvertNumber(pair.content);
-            }
-            membersList.AddRange(pairsOfNumber);
-
-            //判断Bool类型
-            Pair[] pairsOfBool = ParsePairs(ref content, regexPairOfBool);
-            foreach (Pair pair in pairsOfBool)
-            {
-                pair.index = original.IndexOf(pair.content);
-                pair.value = ConfigTools.ConvertBool(pair.content);
-            }
-            membersList.AddRange(pairsOfBool);
-
-            //排序
-            membersList.Sort(Pair.Compare);
-
-            return membersList.ToArray();
+            return obj;
         }
 
         /// <summary>
         /// 解析数组
         /// </summary>
-        /// <param name="content"></param>
+        /// <param name="contentOfArray"></param>
         /// <returns></returns>
-        private static object[] ParseArray(ref string content)
+        private static object[] ParseArray(string contentOfArray)
         {
-            List<object> array = new List<object>();
+            List<object> objects = new List<object>();
+            List<string> items = Split(contentOfArray);
 
-            //排序
-            string original = content.ToString();
-            List<Sort> sorts = new List<Sort>();
-
-            //Object
-            MatchCollection matchObjects = MatchesAndRemove(ref content, regexObject);
-            foreach (Match match in matchObjects)
+            for (int i = 0, l = items.Count; i < l; i++)
             {
-                string s = match.Groups[1].Value;
-                sorts.Add(new Sort(original.IndexOf(s),ParseObject(ref s)));
+                string item = items[i];
+                int type = IsObjectOrArray(item);
+                switch(type)
+                {
+                    case 0:
+                        objects.Add(ParseBaseValue(item));
+                        break;
+                    case 1:
+                        objects.Add(ParseObject(item));
+                        break;
+                    case 2:
+                        objects.Add(ParseArray(item));
+                        break;
+                }
+            }
+            return objects.ToArray();
+        }
+
+        private static object ParseBaseValue(string contentOfValue)
+        {
+            Match result;
+            result = Regex.Match(contentOfValue, regexString);
+            if (result.Success)
+            {
+                return result.Groups[1].Value;
             }
 
-            //数组
-            MatchCollection matchArraies = MatchesAndRemove(ref content, regexArray);
-            foreach (Match match in matchArraies)
+            result = Regex.Match(contentOfValue, regexNumber);
+            if (result.Success)
             {
-                string s = match.Groups[1].Value;
-                sorts.Add(new Sort(original.IndexOf(s), ParseArray(ref s)));
+                return ConfigTools.ConvertNumber(result.Groups[1].Value);
             }
 
-            //String
-            MatchCollection matchStrings = MatchesAndRemove(ref content, regexString);
-            foreach (Match match in matchStrings)
+            result = Regex.Match(contentOfValue, regexBool);
+            if (result.Success)
             {
-                string s = match.Groups[1].Value;
-                sorts.Add(new Sort(original.IndexOf(s), s));
+                return ConfigTools.ConvertBool(result.Groups[1].Value);
             }
 
-            //Number
-            MatchCollection matchNumbers = MatchesAndRemove(ref content, regexNumber);
-            foreach (Match match in matchNumbers)
-            {
-                string s = match.Groups[1].Value;
-                sorts.Add(new Sort(original.IndexOf(s), ConfigTools.ConvertNumber(s)));
-            }
-
-            //Bool
-            MatchCollection matchBools = MatchesAndRemove(ref content, regexBool);
-            foreach (Match match in matchBools)
-            {
-                string s = match.Groups[1].Value;
-                sorts.Add(new Sort(original.IndexOf(s), ConfigTools.ConvertBool(s)));
-            }
-
-            //进行排序
-            sorts.Sort(Sort.Compare);
-            foreach (Sort s in sorts)
-            {
-                array.Add(s.data);
-            }
-
-            return array.ToArray();
+            return null;
         }
 
 
         /// <summary>
-        /// 解析键值对基础（解析出key 和 content）
+        /// 切割对象
         /// </summary>
-        /// <returns></returns>
-        private static Pair[] ParsePairs(ref string content, string regex)
+        /// <param name="name"></param>
+        /// <param name="contentOfValue"></param>
+        private static void SplitObject(string item, out string name, out string contentOfValue)
         {
-            MatchCollection matches = MatchesAndRemove(ref content, regex);
-            int count = matches.Count;
-            Pair[] pairs = new Pair[count];
-            for (int i = 0; i < count; i++)
+            int nameStart = -1;
+            int nameEnd = -1;
+            int colon = -1;
+
+            for (int i = 0, l = item.Length; i < l; i++)
             {
-                Match match = matches[i];
-                string key = match.Groups[1].Value;
-                string valueString = match.Groups[2].Value;
-                pairs[i] = new Pair(key, valueString);
+                if (item[i] == '"')
+                {
+                    if (nameStart == -1)
+                        nameStart = i + 1;
+                    else
+                        nameEnd = i;
+                }
+
+                if (item[i] == ':')
+                {
+                    colon = i;
+                    break;
+                }
             }
-            return pairs;
+            name = item.Substring(nameStart, nameEnd - nameStart);
+            contentOfValue = item.Substring(colon + 1);//值为冒号后面都为值
         }
 
         /// <summary>
-        /// 匹配并删除字段
+        /// 以','切割数组或数组
         /// </summary>
+        /// <param name="objectOrArray">格式 {p1,p2,p3} or [p1,p2,p3] </param>
         /// <returns></returns>
-        private static MatchCollection MatchesAndRemove(ref string content, string regex)
+        private static List<string> Split(string objectOrArray)
         {
-            MatchCollection matches = Regex.Matches(content, regex);
-            int count = matches.Count;
-            if (count > 0)
-            {
-                //删除解析过的字段（避免重复解析）
-                content = Regex.Replace(content, regex, string.Empty);
-            }
-            return matches;
-        }
+            List<string> items = new List<string>();
 
-        
-
-        /// <summary>
-        /// 键值对
-        /// </summary>
-        private class Pair
-        {
-            public string key;//键
-            public string content;//转换之前的文本
-            public object value;//转换后的值
-            public int index;//用于排序
-            public Pair(string key, string content)
+            int last = -1;
+            int level = -1;
+            bool inString = false;
+            for (int i = 0, l = objectOrArray.Length; i < l; i++)
             {
-                this.key = key;
-                this.content = content;
-            }
+                char c = objectOrArray[i];
 
-            public static int Compare(Pair a, Pair b)
-            {
-                if (a.index < b.index)
-                    return -1;
-                else if (a.index > b.index)
-                    return 1;
+                if (c == '"')
+                {
+                    inString = !inString;
+                }
                 else
-                    return 0;
+                {
+                    if (inString)
+                        continue;
+
+                    if (c == '{' || c == '[')
+                    {
+                        if (++level == 0)
+                        {
+                            last = i + 1;
+                        }
+                    }
+                    else if (c == '}' || c == ']')
+                    {
+                        if (level-- == 0)
+                        {
+                            string item = objectOrArray.Substring(last, i - last);
+                            items.Add(item);
+                        }
+                    }
+                    else if (c == ',' && level == 0)
+                    {
+                        string item = objectOrArray.Substring(last, i - last);
+                        items.Add(item);
+                        last = i + 1;
+                    }
+                }
             }
+
+            return items;
         }
 
         /// <summary>
-        /// 用来排序正则取到的字符
+        /// 判断是否是对象或者数组
         /// </summary>
-        private class Sort
+        /// <returns></returns>
+        private static int IsObjectOrArray(string contentOfValue)
         {
-            public int index;
-            public object data;
-
-            public Sort(int i, object data)
+            for (int i = 0, l = contentOfValue.Length; i < l; i++)
             {
-                this.index = i;
-                this.data = data;
-            }
-
-            public static int Compare(Sort a, Sort b)
-            {
-                if (a.index < b.index)
-                    return -1;
-                else if (a.index > b.index)
+                if (contentOfValue[i] == '{')
                     return 1;
-                else
-                    return 0;
+                else if (contentOfValue[i] == '[')
+                    return 2;
             }
+            return 0;
         }
     }
 }

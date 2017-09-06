@@ -77,7 +77,7 @@ namespace ConfigManagerEditor
                     }
                     catch
                     {
-                        UnityEngine.Debug.LogError(string.Format("SourceValue2Object Error!valueType={0},valueString={1}",valueType,valueString));
+                        UnityEngine.Debug.LogError(string.Format("SourceValue2Object Error!valueType={0},valueString={1},source={2},column={3},row={4}", valueType, valueString, source.originalName, x, y));
                     }
                 }
                 configs.SetValue(config, i);

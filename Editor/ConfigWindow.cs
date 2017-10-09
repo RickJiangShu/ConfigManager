@@ -69,8 +69,8 @@ namespace ConfigManagerEditor
 
             cache.txtEnabled = EditorGUILayout.Toggle("*.txt", cache.txtEnabled);
             cache.csvEnabled = EditorGUILayout.Toggle("*.csv", cache.csvEnabled);
-            cache.jsonEnabled = EditorGUILayout.Toggle("*.json", cache.jsonEnabled);
-            cache.xmlEnabled = EditorGUILayout.Toggle("*.xml", cache.xmlEnabled);
+         //   cache.jsonEnabled = EditorGUILayout.Toggle("*.json", cache.jsonEnabled);
+         //   cache.xmlEnabled = EditorGUILayout.Toggle("*.xml", cache.xmlEnabled);
             cache.xlsxEnabled = EditorGUILayout.Toggle("*.xlsx", cache.xlsxEnabled);
 
             //Operation
@@ -408,12 +408,14 @@ namespace ConfigManagerEditor
                 case ".csv":
                     type = OriginalType.Csv;
                     return cache.csvEnabled;
+                    /*
                 case ".json":
                     type = OriginalType.Json;
                     return cache.jsonEnabled;
                 case ".xml":
                     type = OriginalType.Xml;
                     return cache.xmlEnabled;
+                     */
                 case ".xlsx":
                     type = OriginalType.Xlsx;
                     return cache.xlsxEnabled;
@@ -441,8 +443,8 @@ namespace ConfigManagerEditor
 
         public bool txtEnabled = true;
         public bool csvEnabled = true;
-        public bool jsonEnabled = true;
-        public bool xmlEnabled = true;
+    //    public bool jsonEnabled = true;
+     //   public bool xmlEnabled = true;
       //  public bool xlsEnabled = true;
         public bool xlsxEnabled = true;
 

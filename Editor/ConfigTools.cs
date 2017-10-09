@@ -639,6 +639,8 @@ namespace ConfigManagerEditor
         /// <returns></returns>
         public static bool IsSameObjectArray(object[] a, object[] b)
         {
+            return a[0].GetType() == b[0].GetType();
+            /*
             int al = a.Length;
             int bl = b.Length;
             if (al != bl)
@@ -651,6 +653,7 @@ namespace ConfigManagerEditor
             }
 
             return true;
+             */
         }
 
         public static bool IsSameObject(object a, object b)

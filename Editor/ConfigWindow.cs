@@ -379,7 +379,10 @@ namespace ConfigManagerEditor
             if (File.Exists(o))
             {
                 UnityEngine.Object old = AssetDatabase.LoadMainAssetAtPath(o);
-                EditorUtility.CopySerialized(set, old);
+                if(old != null)
+                    EditorUtility.CopySerialized(set, old);
+                else
+                    AssetDatabase.CreateAsset(set, o);
             }
             else
             {
